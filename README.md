@@ -12,16 +12,16 @@ Follow these steps to get your own Docker container instance:
 
 git clone https://github.com/ibmdbanalytics/dashdb_analytic_tools.git
 
-docker build -t <image name>.
+docker build -t &#60;image name&#60; .
 
-docker run -d -p 8787:8787 <image name>
+docker run -d -p 8787:8787 &#60;image name&#60;
 
 ###Bluemix
 In case you want to use Bluemix to host your container for RStudio and dashDB use the below after your have clones the git repository to a local directory:
 
-cf ic build -t registry.ng.bluemix.net/<private namespace>/<image name> .
+cf ic build -t registry.ng.bluemix.net/&#60;private namespace&#60;/&#60;image name&#60; .
 
-cf ic run -p 8787 registry.ng.bluemix.net/<private namespace>/<image name>
+cf ic run -p 8787 registry.ng.bluemix.net/&#60;private namespace&#60;/&#60;image name&#60;
 
 
 You can figure out the IP address of the Bluemix container in Bluemix with cf ic ip <container id>
