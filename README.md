@@ -16,6 +16,8 @@ docker build -t &#60;image name&#62; .
 
 docker run -d -p 8787:8787 &#60;image name&#62;
 
+Then point your browser to &#60;IP address&#62;:8787 in order to launch the RStudio web UI. The default user and pw is rstudio/rstudio.
+
 ###Bluemix
 In case you want to use Bluemix to host your container for RStudio and dashDB use the below after your have clones the git repository to a local directory:
 
