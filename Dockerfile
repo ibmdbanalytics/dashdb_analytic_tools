@@ -16,8 +16,8 @@ RUN rm -rf /var/lib/apt/lists/ \
   && apt-get -y install ksh \
   && apt-get -y install ssh \
   && R -f /install.R \
-  && wget https://iwm.dhe.ibm.com/sdfdl/v2/regs2/smkane/IDSDPDS/Xa.2/Xb.EjTAa9JmwNlaYcDn_A0b-xsxDqgAiUks4GRoaTkuKrA/Xc.ibm_data_server_driver_package_linuxx64_v10.5.tar.gz/Xd./Xf.LPr.D1vk/Xg.8475146/Xi.swg-idsdpds/XY.regsrvs/XZ.lNsJqIBCteNWhjd4haO3zjETJXc/ibm_data_server_driver_package_linuxx64_v10.5.tar.gz \
-  && tar -xvzf v10.5fp7_linux64_dsdriver.tar.gz \
+  && wget https://delivery04.dhe.ibm.com/sdfdl/v2/sar/CM/IM/05ug4/2/Xa.2/Xb.jusyLTSp44S0BvkRF-6duDE3qesroroRBMJdiMD4DvzE79MnOVFibW_Co8s/Xc.CM/IM/05ug4/2/v10.5fp7_linuxx64_dsdriver.tar.gz/Xd./Xf.LPR.D1vk/Xg.8476663/Xi.habanero/XY.habanero/XZ.WqDh2N0pS7knJ72Xe6qnGtcdc1o/v10.5fp7_linuxx64_dsdriver.tar.gz \
+  && tar -xvzf v10.5fp7_linuxx64_dsdriver.tar.gz \
   && dsdriver/installDSDriver \
   && printf "[DASHDB]\nDriver = /dsdriver/lib/libdb2o.so\n" >> /etc/odbc.ini \
   && adduser rstudio sudo \
