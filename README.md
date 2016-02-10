@@ -12,6 +12,11 @@ Follow these steps to get your own Docker container instance:
 
 git clone https://github.com/ibmdbanalytics/dashdb_analytic_tools.git
 
+Download the driver package ibm_data_server_driver_package_linuxx64_v10.5.tar.gz from the dashDB console 
+(Connect > Download Tools) and put it into the same directory as the Dockerfile.
+
+Now you can build the image:
+
 docker build -t &#60;image name&#62; .
 
 docker run -d -p 8787:8787 &#60;image name&#62;
