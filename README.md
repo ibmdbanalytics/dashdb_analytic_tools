@@ -12,7 +12,7 @@ Follow these steps to get your own Docker container instance:
 
 git clone https://github.com/ibmdbanalytics/dashdb_analytic_tools.git
 
-Download the dashDB driver package ibm_data_server_driver_package_linuxx64_v10.5.tar.gz. You can download it either from the dashDB web console (Log in with your dashDB credentials and then: Connect > Download Tools) or from the IBM support web site: https://www.ibm.com/services/forms/preLogin.do?source=swg-idsdpds (after logging in with your IBM ID - sign-up is free - select offering "IBM Data Server Driver Package (Linux AMD64 and Intel EM64T)" with Platform "Linux").
+Download the dashDB driver package ibm_data_server_driver_package_linuxx64_v10.5.tar.gz. You can download it either from the dashDB web console (Log in with your dashDB credentials and then: Connect > Download Tools) or from the IBM support web site: http://www-01.ibm.com/support/docview.wss?uid=swg21385217 (Select package "IBM Data Server Driver Package (DS Driver)", log in with your IBM ID - sign-up is free - and select offering "IBM Data Server Driver Package (Linux AMD64 and Intel EM64T)" with Platform "Linux").
 
 Put the downloaded ibm_data_server_driver_package_linuxx64_v10.5.tar.gz into the same directory as the Dockerfile.
 
