@@ -40,6 +40,10 @@ For more information on Bluemix containers refer to this [documentation](https:/
 
 This is work in progress. For any request please contact torsten@de.ibm.com or MWURST@de.ibm.com.
 
+## License ##
+
+The docker file above and the content of the samples directory are provided under the GPL v2 or later. 
+
 ## Base Docker Containers ##
 
 | Docker Container Source on GitHub             | Docker Hub Build Status and URL
