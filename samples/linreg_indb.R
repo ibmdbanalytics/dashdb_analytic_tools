@@ -36,10 +36,8 @@ library(ibmdbR)
 ## under Connect -> Connection Information in the dashDB web ui
 ######################################################################
 host.name <- ""
-#host.name <- "awh-yp-small02.services.dal.bluemix.net"
-
-user.name <-"dash104803"
-pwd <- "IV4mZs1r9Vg5"
+user.name <-""
+pwd <- ""
 ######################################################################
 
 if((nchar(host.name)==0)||(nchar(user.name)==0)||(nchar(pwd)==0))
