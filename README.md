@@ -37,6 +37,10 @@ You can figure out the IP address of the Bluemix container in Bluemix with cf ic
 
 For more information on Bluemix containers refer to this [documentation](https://www.ng.bluemix.net/docs/containers/container_cli_reference_cfic.html)
 
+## Running a sample R script ##
+
+The docker file above creates a directory samples in the user home directory. You can run the samples in this directory directly, just modify the user, password and host variables in the upper part of script to the ones that reflect the database you are connecting to. If you use IBM dashDB on BlueMix, then all sample data is already preloaded. If you run against a different system, you might need to upload some sample data before running the samples. To do so, upload the three CSV files above to tables in your database, using the table names SAMPLES.SHOWCASE_SYSTYPES, SAMPLES.SHOWCASE_SYSUSAGE and SAMPLES.SHOWCASE_SYSTEMS. If you choose different table names, you have to modify the script where indicated.
+
 ## Status ##
 
 This is work in progress. For any request please contact torsten@de.ibm.com or MWURST@de.ibm.com.
