@@ -8,32 +8,29 @@ This project generates a Docker image that is based on the [rocker/rstudio](http
 
 Follow these steps to get your own Docker container instance:
 
-git clone https://github.com/ibmdbanalytics/dashdb_analytic_tools.git
-
-Download the dashDB driver package ibm_data_server_driver_package_linuxx64_v10.5.tar.gz. You can download it either from the dashDB web console (Log in with your dashDB credentials and then: Connect > Download Tools) or from the IBM support web site: http://www-01.ibm.com/support/docview.wss?uid=swg21385217 (Select package "IBM Data Server Driver Package (DS Driver)", log in with your IBM ID - sign-up is free - and select offering "IBM Data Server Driver Package (Linux AMD64 and Intel EM64T)" with Platform "Linux").
-
-Put the downloaded ibm_data_server_driver_package_linuxx64_v10.5.tar.gz into the same directory as the Dockerfile.
-
-Now you can build the image:
-
-docker build -t &#60;image name&#62; .
-
-docker run -d -p 8787:8787 &#60;image name&#62;
-
-Then point your browser to &#60;IP address&#62;:8787 in order to launch the RStudio web UI. The default user and pw is rstudio/rstudio.
-
-###Bluemix
-In case you want to use Bluemix to host your RStudio container for analtics of data in dashDB services use the below Bluemix cf commands instead of the plain docker commands after you have cloned the git repository to a local directory and downloaded the driver package as described above:
-
-cf ic build -t registry.ng.bluemix.net/&#60;private namespace&#62;/&#60;image name&#62; .
-
-cf ic run -p 8787 registry.ng.bluemix.net/&#60;private namespace&#62;/&#60;image name&#62;
-
-
-You can figure out the IP address of the Bluemix container in Bluemix with cf ic ip <container id>
-
-
-For more information on Bluemix containers refer to this [documentation](https://www.ng.bluemix.net/docs/containers/container_cli_reference_cfic.html)
+1. Issue this command to clone the repository into a new directory:
+  - git clone https://github.com/ibmdbanalytics/dashdb_analytic_tools.git
+2. Download the dashDB driver package **ibm_data_server_driver_package_linuxx64_v10.5.tar.gz** into the same directory from either of the following sources:
+  * From the dashDB web console:
+    1. Log in with your dashDB credentials.
+    2. Click **Connect > Download Tools**.
+  * From the [IBM support web site] (http://www-01.ibm.com/support/docview.wss?uid=swg21385217):
+    1. Select the package **IBM Data Server Driver Package (DS Driver)**.
+    2. Log in with your IBM ID (sign-up is free).
+    3. Select the offering **IBM Data Server Driver Package (Linux AMD64 and Intel EM64T)** for the Linux platform.
+3. Build the image:
+  * If you want to build the image and run the container in your own Linux environment, issue these commands:
+    - `docker build -t <image name>`
+    - `docker run -d -p 8787:8787 <image name>`
+  * If you want to use Bluemix to host your RStudio container, issue these commands:
+    - `cf ic build -t registry.ng.bluemix.net/<private namespace>/<image name>`
+    - `cf ic run -p 8787 registry.ng.bluemix.net/<private namespace>/<image name>`
+    - `cf ic ip`
+  - The last of these commands returns the IP address of the RStudio container in Bluemix. For more information about Bluemix containers, refer to this [documentation](https://www.ng.bluemix.net/docs/containers/container_cli_reference_cfic.html).
+4. To launch the RStudio web UI:
+  * On a Linux system, point your browser to `<ip_addr>:8787`, where `<ip_addr>` represents the IP address of the Linux system that hosts the RStudio container.  
+  * On a Windows or Mac system, use the [Docker Toolbox] (https://www.docker.com/products/docker-toolbox) to create a Docker environment on you computer in which you can run Docker commands and containers.
+5. Log in to RStudio. The default user and password are both **rstudio**. For security, change the password immediately after you log in for the first time.
 
 ## Running a sample R script ##
 
