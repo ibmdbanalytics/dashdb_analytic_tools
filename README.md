@@ -2,9 +2,7 @@
 
 ## Overview ##
 
-This project generates a Docker image that extends the [rocker/rstudio](https://github.com/rocker-org/rocker/tree/master/rstudio) image by dashDB specific components, such as IBM Data Server Driver packages and ibmdbR and ibmdbRXt packages for R. For basic image usage the same [documentation](https://github.com/rocker-org/rocker/wiki) like to the base image applies.
-
-The intention is to extend the image further with other analytical tools suited for dashDB.
+This project generates a Docker image that is based on the [rocker/rstudio](https://github.com/rocker-org/rocker/tree/master/rstudio) image but that includes additional dashDB-specific components, such as IBM Data Server Driver packages and the ibmdbR and ibmdbRXt packages for R. The components provided by the rocker/rstudio image are described in the [documentation](https://github.com/rocker-org/rocker/wiki) for that image.
 
 ## Getting Started ##
 
