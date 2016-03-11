@@ -27,6 +27,11 @@ Follow these steps to get your own Docker container instance:
     - `cf ic build -t registry.ng.bluemix.net/<private namespace>/<image name>`
     - `cf ic run -p 8787 registry.ng.bluemix.net/<private namespace>/<image name>`
     - `cf ic ip`
+  * If you already built the image locally you can push it to Bluemix like this:
+    - `cf login`
+    - `cf ic login`
+    - `docker tag <image name> registry.ng.bluemix.net/<private namespace>/<image name>`
+    - `docker push registry.ng.bluemix.net/<private namespace>/<image name>`
 
     The last of these commands returns the IP address of the RStudio container in Bluemix. Click [here] (https://www.ng.bluemix.net/docs/containers/container_cli_reference_cfic.html) for more information about Bluemix containers.
 4. To launch the RStudio web UI:
