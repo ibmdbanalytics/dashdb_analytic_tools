@@ -29,4 +29,4 @@ RUN rm -rf /var/lib/apt/lists/ \
 ADD samples /home/rstudio/samples
 
 ## Add ssh deamon to startup sequence
-RUN cat /supervisor.conf >> /etc/supervisor/conf.d/supervisord.conf
+##RUN cat /supervisor.conf >> /etc/supervisor/conf.d/supervisord.conf
