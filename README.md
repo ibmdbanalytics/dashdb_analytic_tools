@@ -1,4 +1,4 @@
-# dashdb_analytic_tools
+# Building and deploying an RStudio container for dashDB
 
 ## Overview ##
 
@@ -8,12 +8,14 @@ This project generates a Docker image that is based on the [rocker/rstudio](http
 
 Follow these steps to get your own Docker container instance:
 
-1. Issue this command to clone the repository into a new directory:
+1. Install a Git client in your path.
+
+2. Issue this command to clone the repository into a new directory:
    
   `git clone https://github.com/ibmdbanalytics/dashdb_analytic_tools.git`
  
  This creates a new directory **dashdb_analytic_tools**.
-2. Download the dashDB driver package **ibm_data_server_driver_package_linuxx64_v10.5.tar.gz** into the same dashdb_analytic_tools directory from either of the following sources:
+3. Download the dashDB driver package **ibm_data_server_driver_package_linuxx64_v10.5.tar.gz** into the same dashdb_analytic_tools directory from either of the following sources:
   * From the dashDB web console:
     1. Log in with your dashDB credentials.
     2. Click **Connect > Download Tools**.
@@ -22,7 +24,7 @@ Follow these steps to get your own Docker container instance:
     2. Log in with your IBM ID (sign-up is free).
     3. Select the offering **IBM Data Server Driver Package (Linux AMD64 and Intel EM64T)** for the Linux platform.
   * Make sure the downloaded file is really named **ibm_data_server_driver_package_linuxx64_v10.5.tar.gz**. Rename it if this is not the case before you continue with the build process.
-3. Build the image:
+4. As a user with root authority, build the image:
   * If you want to build the image and run the container in your own Linux environment, issue these commands:
     - `docker build -t <image name> <path to your dashdb_analytic_tools directory>`
     - `docker run -d -p 8787:8787 <image name>`
@@ -37,16 +39,26 @@ Follow these steps to get your own Docker container instance:
     - `docker push registry.ng.bluemix.net/<private namespace>/<image name>`
 
     The last of these commands returns the IP address of the RStudio container in Bluemix. Click [here] (https://www.ng.bluemix.net/docs/containers/container_cli_reference_cfic.html) for more information about Bluemix containers.
-4. To launch the RStudio web UI:
+5. To launch the RStudio web UI:
   * On a Linux system, point your browser to `<ip_addr>:8787`, where `<ip_addr>` represents the IP address of the Linux system that hosts the RStudio container.  
   * On a Windows or Mac system, use the [Docker Toolbox] (https://www.docker.com/products/docker-toolbox) to create a Docker environment on you computer in which you can run Docker commands and containers.
-5. Log in to RStudio. The default user and password are both **rstudio**. For security, change the password immediately after you log in for the first time.
+6. Log in to RStudio. The default user and password are both **rstudio**. For security, change the password immediately after you log in for the first time.
 
 ## Running a sample R script ##
 
-The docker file above creates a directory of sample scripts in the user home directory. To run a sample script in this directory directly, modify the user, password, and host variables in the script as appropriate for the database that you are connecting to. 
+The docker file you build in step #4 creates a "samples" directory in your home directory, with a sample script linreg_indb.R. All of the sample data used by this script is preloaded for dashDB databases*. Follow these steps to run linreg_indb.R directly in this directory:
 
-If you use IBM dashDB on BlueMix, all the sample data used by these scripts is already preloaded. If you use a different system, you will need to upload the sample data before running the sample scripts. To do this:
+1.	Enter the running RStudio container:
+
+  `docker exec -it <container-id> bash`
+2. Use a text editor to modify the user, password, and host variables in the script as appropriate for the database that you are connecting to. 
+3. Execute the script from the command line:
+
+  `Rscript linreg_indb.R`
+
+
+
+*Note: If you use a different system that does not have the preloaded sample data, you need to upload it before running the linreg_indb.R script, using the following steps:
 
 1. Download the following three CSV files: 
    * [SHOWCASE_SYSTYPES.csv] (https://github.com/ibmdbanalytics/dashdb_analytic_tools/blob/master/SHOWCASE_SYSTYPES.csv)
