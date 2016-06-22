@@ -1,3 +1,15 @@
+library(ibmdbR)
+
+######################################################################
+## Set the connection information corresponding to you dashDB instance
+## You will find the connection informatation 
+## under Connect -> Connection Information in the dashDB web ui
+######################################################################
+host.name <- ""
+user.name <-""
+pwd <- ""
+######################################################################
+
 # Create a pointer to the private R object storage table of the current user.
 myPrivateObjects <- ida.list(type='private')
 
