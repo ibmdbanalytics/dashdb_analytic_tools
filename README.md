@@ -47,19 +47,9 @@ Follow these steps to get your own Docker container instance:
 
 ## Running a sample R script ##
 
-The docker file you build in step #4 creates a "samples" directory in your home directory, with a sample script linreg_indb.R. All of the sample data used by this script is preloaded for dashDB databases*. Follow these steps to run linreg_indb.R directly in this directory:
+The docker file you build in step #4 creates a "samples" directory in your home directory, with a sample scripts. You can load these samples directly from RStudio by opening the samples directory. To run any example you have to edit the file to contain the right host, user name and password variables according to your dashDB system.
 
-1.	Enter the running RStudio container:
-
-  `docker exec -it <container-id> bash`
-2. Use a text editor to modify the user, password, and host variables in the script as appropriate for the database that you are connecting to. 
-3. Execute the script from the command line:
-
-  `Rscript linreg_indb.R`
-
-
-
-*Note: If you use a different system that does not have the preloaded sample data, you need to upload it before running the linreg_indb.R script, using the following steps:
+Most samples upload their own data, however some expect the following tables to be present. This should be the case for dashDB aaS, but might not be true on other systems. If the data is not present, you need to upload it before running the samples using the following steps:
 
 1. Download the following three CSV files: 
    * [SHOWCASE_SYSTYPES.csv] (https://github.com/ibmdbanalytics/dashdb_analytic_tools/blob/master/SHOWCASE_SYSTYPES.csv)
