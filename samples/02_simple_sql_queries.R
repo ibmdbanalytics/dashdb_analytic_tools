@@ -1,3 +1,5 @@
+library(ibmdbR)
+
 ######################################################################
 ## Set the connection information corresponding to you dashDB instance
 ## You will find the connection informatation 
