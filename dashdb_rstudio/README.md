@@ -14,8 +14,8 @@ Follow these steps to get your own Docker container instance:
    
   `git clone https://github.com/ibmdbanalytics/dashdb_analytic_tools.git`
  
- This creates a new directory **dashdb_analytic_tools**.
-3. Download the dashDB driver package **ibm_data_server_driver_package_linuxx64_v10.5.tar.gz** into the same dashdb_analytic_tools directory from either of the following sources:
+ This creates a new directory **dashdb_analytic_tools** with subdirectory dashdb_rstudio. Change to the dashdb_rstudio subdirectory.
+3. Download the dashDB driver package **ibm_data_server_driver_package_linuxx64_v10.5.tar.gz** into the same dashdb_rstudio directory from either of the following sources:
   * From the dashDB web console:
     1. Log in with your dashDB credentials.
     2. Click **Connect > Download Tools**.
@@ -26,10 +26,10 @@ Follow these steps to get your own Docker container instance:
   * Make sure the downloaded file is really named **ibm_data_server_driver_package_linuxx64_v10.5.tar.gz**. Rename it if this is not the case before you continue with the build process.
 4. As a user with root authority, build the image:
   * If you want to build the image and run the container in your own Linux environment, issue these commands:
-    - `docker build -t <image name> <path to your dashdb_analytic_tools directory>`
+    - `docker build -t <image name> <path to your dashdb_rstudio directory>`
     - `docker run -d -p 8787:8787 <image name>`
   * If you want to use Bluemix to host your RStudio container, issue these commands:
-    - `cf ic build -t registry.ng.bluemix.net/<private namespace>/<image name>  <path to your dashdb_analytic_tools directory>`
+    - `cf ic build -t registry.ng.bluemix.net/<private namespace>/<image name>  <path to your dashdb_rstudio directory>`
     - `cf ic run -p 8787 registry.ng.bluemix.net/<private namespace>/<image name>`
     - `cf ic ip`
   * If you already built the image locally you can push it to Bluemix like this:
@@ -52,9 +52,9 @@ The docker file you build in step #4 creates a "samples" directory in your home 
 Most samples upload their own data, however some expect the following tables to be present. This should be the case for dashDB aaS, but might not be true on other systems. If the data is not present, you need to upload it before running the samples using the following steps:
 
 1. Download the following three CSV files: 
-   * [SHOWCASE_SYSTYPES.csv] (https://github.com/ibmdbanalytics/dashdb_analytic_tools/blob/master/SHOWCASE_SYSTYPES.csv)
-   * [SHOWCASE_SYSUSAGE.csv] (https://github.com/ibmdbanalytics/dashdb_analytic_tools/blob/master/SHOWCASE_SYSUSAGE.csv)
-   * [SHOWCASE_SYSTEMS.csv] (https://github.com/ibmdbanalytics/dashdb_analytic_tools/blob/master/SHOWCASE_SYSTEMS.csv)
+   * [SHOWCASE_SYSTYPES.csv] (./SHOWCASE_SYSTYPES.csv)
+   * [SHOWCASE_SYSUSAGE.csv] (./SHOWCASE_SYSUSAGE.csv)
+   * [SHOWCASE_SYSTEMS.csv] (./SHOWCASE_SYSTEMS.csv)
 2. Load the contents of these CSV files into the following tables in your database:
    * SAMPLES.SHOWCASE_SYSTYPES 
    * SAMPLES.SHOWCASE_SYSUSAGE 
@@ -64,7 +64,7 @@ If you choose different table names, modify the script to reflect these differen
 
 ## Status ##
 
-This is work in progress. For any request please contact torsten@de.ibm.com or mwurst@de.ibm.com.
+This is work in progress. For any request please contact torsten@de.ibm.com.
 
 ## License ##
 

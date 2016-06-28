@@ -1,0 +1,8 @@
+{
+  "display_name": "IDAX - Scala",
+  "language": "scala",
+  "argv": [
+    "/opt/conda/share/jupyter/kernels/run-toree.py",
+    "{connection_file}"
+  ]
+}
