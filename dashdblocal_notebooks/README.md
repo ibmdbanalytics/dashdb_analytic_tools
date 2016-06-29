@@ -27,14 +27,14 @@ Follow these steps to get your own Docker container instance:
 
 2. Issue this command to clone the repository into a new directory:
 
-	git clone https://github.com/ibmdbanalytics/dashdb_analytic_tools.git
+    git clone https://github.com/ibmdbanalytics/dashdb_analytic_tools.git
  
  This creates a new directory **dashdb_analytic_tools** with subdirectory dashdblocal_notebooks. 
  Change to the dashdblocal_notebooks subdirectory.
 
 3. As a user with root authority, build the image:
 
-	docker build -t <image name> <path to your dashdblocal_notebooks directory>
+    docker build -t <image name> <path to your dashdblocal_notebooks directory>
 
 4. Start a notebook container, specifying the user name and the password of a user that you have created 
  inside the dashDB installation (e.g. bluadmin)
