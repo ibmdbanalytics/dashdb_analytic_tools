@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+# Upload Toree kernel to dashDB local via REST API
+
 import sys, os
 import shutil, glob
 import json, requests
@@ -24,7 +26,7 @@ try:
 	resp = requests.post("https://{0}:8443/dashdb-api/home/spark/apps".format(bluhost),
 		files = upload, auth=auth, verify=False)
 except requests.exceptions.ConnectionError:
-	sys.exit("Could not connect to bluemix server {0}".format(bluhost))
+	sys.exit("Could not connect to dashDB server {0}".format(bluhost))
 
 if (resp.status_code != requests.codes.ok and
 		resp.json()['resultCode'] != 'SUCCESS'):
