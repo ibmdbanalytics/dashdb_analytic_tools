@@ -6,11 +6,11 @@ This project generates a Docker image that is based on the
 [jupyter/base-notebook](https://github.com/jupyter/docker-stacks/tree/master/base-notebook) image,
 providing a [Jupyter notebook](http://jupyter.org/) container for 
 [dashDB local](http://www.ibm.com/analytics/us/en/technology/cloud-data-services/dashdb-local/). 
-It supports execution of Spark/Scala and Spark/Python kernels in the Spark environment provided 
+It supports execution of Spark/Scala and Spark/Python kernels in the Apache Spark environment provided 
 by dashDB local, using the [Apache Toree](https://toree.incubator.apache.org/) kernel. 
 
 Unlike the Spark notebooks in 
-[jupyter/docker-stacks](https://github.com/jupyter/docker-stacks), there is no Spark installation 
+[jupyter/docker-stacks](https://github.com/jupyter/docker-stacks), there is no Apache Spark installation 
 in the notebook container, Spark driver and executor processes run in the dashDB local
 Spark environment. The Spark applications can access dashDB data easily and efficiently 
 and there are no versioning issues between Spark components running in different containers.
@@ -21,7 +21,7 @@ Using this container requires a dashDB local installation where the integrated S
 
 Follow these steps to get your own Docker container instance:
 
-1. Log in to a host machine that hosts a dashDB local SMP installation the head node of a MPP installation.
+1. Log in to a host machine that hosts a dashDB local SMP installation or to the head node of a MPP installation.
 
 1. Install a Git client in your path.
 
@@ -56,6 +56,10 @@ To shut down the notebook server and the container, press Ctrl-C from the consol
 or use `docker stop <container>` from a different terminal
 If you have verified that the container works and want to run it as a background service, replace the `-i --rm`
 arguments with `-d`
+
+## Monitoring
+
+In the dashDB local web console you can find under Monitor->Workloads a tab for Spark. From there you can launch the Apache Spark monitoring web UI. The Toree Spark kernel used by the Notebook can be accessed there to be monitored with the application name "IBM Spark Kernel".
 
 ## Running multiple containers ##
  
