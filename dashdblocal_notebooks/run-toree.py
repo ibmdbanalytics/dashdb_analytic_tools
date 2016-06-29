@@ -14,10 +14,10 @@ conn_file_in = sys.argv[1]
 # extra arguments are passed on to toree kernel
 extra_args = sys.argv[2:]
 
-BLUHOST = os.environ['BLUHOST']
-BLUUSER = os.environ['BLUUSER']
-BLUPW = os.environ['BLUPW']
-if (not BLUUSER or not BLUPW): sys.exit("BLUHOST, BLUUSER and BLUPW variables must be defined")
+BLUHOST = os.environ.get('BLUHOST')
+BLUUSER = os.environ.get('BLUUSER')
+BLUPW = os.environ.get('BLUPW')
+if (not BLUUSER or not BLUPW or not BLUHOST): sys.exit("BLUUSER and BLUPW variables must be defined")
 IS_REMOTE_KERNEL = (BLUHOST != "localhost" and BLUHOST != "127.0.0.1")
 
 jobid = None
@@ -33,7 +33,7 @@ def upload_conn_info(conn_file_name, conn_file_content):
 	resp = session.post("https://{0}:8443/dashdb-api/home/tmp".format(BLUHOST),
 					files = upload, auth=auth, verify=False)
 	if (resp.status_code != requests.codes.ok and
-			resp.json()['resultCode'] != 'SUCCESS'): 
+			resp.json().get('resultCode') != 'SUCCESS'): 
 		sys.exit ("Failed to upload communication file " + conn_file_in)
 	print("Upload complete: " + resp.text)
 
@@ -52,7 +52,7 @@ def start_kernel(toree_args):
 	if (resp.status_code != requests.codes.ok): 
 		sys.exit ("Failed to submit Spark kernel job: " + resp.text)
 	resp_data = resp.json()
-	if (resp_data['status'] != 'submitted'):
+	if (resp_data.get('status') != 'submitted'):
 		sys.exit ("Failed to submit Spark kernel job: " + resp.text)
 
 	jobid = resp_data['jobid']
@@ -69,12 +69,12 @@ def monitor_kernel():
 			warnings.simplefilter("ignore")
 			resp = session.get("https://{0}:8443/clues/public/monitoring/job_status".format(BLUHOST),
 				params={'jobid': jobid}, auth=auth, verify=False)
-		if (resp.json()['status'] != 'running'):
+		if (resp.json().get('status') != 'running'):
 			print(resp.text)
 			break
 		if (i == 0):
-			print(resp.text)  #  print message every 10 seconds that we're still alive
-			i = 10
+			print(resp.text)  #  print message every minute that we're still alive
+			i = 60
 		i -= 1
 		time.sleep(1) # sleep a second
 	jobid = None
