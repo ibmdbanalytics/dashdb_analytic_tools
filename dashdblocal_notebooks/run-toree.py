@@ -14,11 +14,11 @@ conn_file_in = sys.argv[1]
 # extra arguments are passed on to toree kernel
 extra_args = sys.argv[2:]
 
-BLUHOST = os.environ.get('BLUHOST')
-BLUUSER = os.environ.get('BLUUSER')
-BLUPW = os.environ.get('BLUPW')
-if (not BLUUSER or not BLUPW or not BLUHOST): sys.exit("BLUUSER and BLUPW variables must be defined")
-IS_REMOTE_KERNEL = (BLUHOST != "localhost" and BLUHOST != "127.0.0.1")
+DASHDBHOST = os.environ.get('DASHDBHOST')
+DASHDBUSR = os.environ.get('DASHDBUSR')
+DASHDBPW = os.environ.get('DASHDBPW')
+if (not DASHDBUSR or not DASHDBPW or not DASHDBHOST): sys.exit("DASHDBUSR and DASHDBPW variables must be defined")
+IS_REMOTE_KERNEL = (DASHDBHOST != "localhost" and DASHDBHOST != "127.0.0.1")
 
 jobid = None
 
@@ -30,7 +30,7 @@ def upload_conn_info(conn_file_name, conn_file_content):
 		# reconfigure remote kernel to listen on all interfaces
 		conn_upload['ip'] = '0.0.0.0'
 	upload = { conn_file_name: json.dumps(conn_file_content) }
-	resp = session.post("https://{0}:8443/dashdb-api/home/tmp".format(BLUHOST),
+	resp = session.post("https://{0}:8443/dashdb-api/home/tmp".format(DASHDBHOST),
 					files = upload, auth=auth, verify=False)
 	if (resp.status_code != requests.codes.ok and
 			resp.json().get('resultCode') != 'SUCCESS'): 
@@ -46,7 +46,7 @@ def start_kernel(toree_args):
 		'appResource' : 'toree.jar',
 		'mainClass' : 'org.apache.toree.Main'
 	}
-	resp = session.post("https://{0}:8443/clues/public/jobs/submit".format(BLUHOST),
+	resp = session.post("https://{0}:8443/clues/public/jobs/submit".format(DASHDBHOST),
 		json=req_data, auth=auth, verify=False)
 
 	if (resp.status_code != requests.codes.ok): 
@@ -67,7 +67,7 @@ def monitor_kernel():
 	while (True):
 		with warnings.catch_warnings():
 			warnings.simplefilter("ignore")
-			resp = session.get("https://{0}:8443/clues/public/monitoring/job_status".format(BLUHOST),
+			resp = session.get("https://{0}:8443/clues/public/monitoring/job_status".format(DASHDBHOST),
 				params={'jobid': jobid}, auth=auth, verify=False)
 		if (resp.json().get('status') != 'running'):
 			print(resp.text)
@@ -86,7 +86,7 @@ def stop_kernel():
 	print("Shutting down")
 	if (jobid):
 		print("Trying to stop kernel")
-		resp = session.post("https://{0}:8443/clues/public/jobs/cancel".format(BLUHOST),
+		resp = session.post("https://{0}:8443/clues/public/jobs/cancel".format(DASHDBHOST),
 			params={'jobid': jobid}, auth=auth, verify=False)
 		print(resp.text)
 		
@@ -108,7 +108,7 @@ def forward_ports(connection_info):
 			connection_info['hb_port'] ]
 	print("Forwarding ports " + str(ports))
 	for port in ports:
-		_thread.start_new_thread(forward_socket, (port, BLUHOST))
+		_thread.start_new_thread(forward_socket, (port, DASHDBHOST))
 		
 def forward_socket(port, target):
 	try:
@@ -144,10 +144,10 @@ def forward_connection(source, destination, id):
 
 
 conn_file_name = os.path.basename(conn_file_in)
-conn_file_out = "/mnt/blumeta0/home/{0}/tmp/{1}".format(BLUUSER, conn_file_name)
+conn_file_out = "/mnt/blumeta0/home/{0}/tmp/{1}".format(DASHDBUSR, conn_file_name)
 
 session = requests.Session()
-auth = HTTPBasicAuth(BLUUSER, BLUPW)
+auth = HTTPBasicAuth(DASHDBUSR, DASHDBPW)
 
 # handle kernel interrupting explicitly
 signal.signal(signal.SIGINT, interrupted)
@@ -155,7 +155,7 @@ signal.signal(signal.SIGINT, interrupted)
 atexit.register(stop_kernel)
 
 
-print("Uploading {0} to {1} on {2}".format(conn_file_in, conn_file_out, BLUHOST))
+print("Uploading {0} to {1} on {2}".format(conn_file_in, conn_file_out, DASHDBHOST))
 with open(conn_file_in, 'r') as f:
 	conn_file_content = json.loads(f.read())
 upload_conn_info(conn_file_name, conn_file_content)

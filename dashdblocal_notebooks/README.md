@@ -39,7 +39,7 @@ Follow these steps to get your own Docker container instance:
 4. Start a notebook container, specifying the user name and the password of a user that you have created 
  inside the dashDB installation (e.g. bluadmin)
  
-	`docker run -it --rm --net=host -e BLUUSER=<user> -e BLUPW=<password> <image name>`
+	`docker run -it --rm --net=host -e DASHDBUSR=<user> -e DASHDBPW=<password> <image name>`
 	
  Note that the dashDB local container as well as the notebook container use `--net=host` so they share
  the same network devices (fortunately, there are no port conflicts). In particular, the Jupyter server "sees" the
@@ -73,7 +73,7 @@ If you want to explicitly set the notebook port when running multiple containers
 `--port` argument and the container launch script. Launch script arguments are passed through to the 
 Jupyter notebook command, see https://jupyter-notebook.readthedocs.io/en/latest/config.html for possible options.
 
-	`docker run -it --rm --net=host -e BLUUSER=<user> -e BLUPW=<password> <image name> launch-with-idax.sh --port=9999`
+	`docker run -it --rm --net=host -e DASHDBUSR=<user> -e DASHDBPW=<password> <image name> launch-with-idax.sh --port=9999`
     
 ## Storing notebooks outside the container ##
 
@@ -98,7 +98,7 @@ the recommended place for keeping the files is the user's home directory:
 
 3. Now add the following arguments when running the notebook container
 
-	`docker run -v /mnt/clusterfs/home/bluuser1/notebooks:/home/jovyan/work -e NB_UID=5003 --user=root -e BLUUSER=bluuser1 -e BLUPW=blupass1 -it --rm --net=host <image name>`
+	`docker run -v /mnt/clusterfs/home/bluuser1/notebooks:/home/jovyan/work -e NB_UID=5003 --user=root -e DASHDBUSR=bluuser1 -e DASHDBPW=blupass1 -it --rm --net=host <image name>`
 
   Notebooks are now stored in /mnt/clusterfs/home/bluuser1/notebooks, which corresponds to the home folder
   of user bluuser1 in the dasdDB container. The directory is created if it does not exist.
@@ -109,9 +109,9 @@ The notebook container also includes basic support for remote kernels by forward
 communication ports. So instead of running it on the same docker host that hosts the dashDB container, 
 you can run it on any machine.
 
-	`docker run -it --rm -p 8888:8888 -e BLUHOST=<dashDB-hostname> -e BLUUSER=<user> -e BLUPW=<password> <image name>`
+	`docker run -it --rm -p 8888:8888 -e DASHDBHOST=<dashDB-hostname> -e DASHDBUSR=<user> -e DASHDBPW=<password> <image name>`
 
-Note the missing --net=host and and the BLUHOST env variable.
+Note the missing --net=host and and the DASHDBHOST env variable.
 
 The port forwarding mechanism is quite basic and has shown to be unstable under some conditions. 
 Running the notebook container on the same docker host with `--net=host` is currently the preferred approach.

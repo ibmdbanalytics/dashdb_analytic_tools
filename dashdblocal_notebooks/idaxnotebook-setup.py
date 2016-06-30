@@ -11,22 +11,22 @@ if (len(sys.argv) < 2): sys.exit("Expecting upload file name as first argument")
 
 upload_file = sys.argv[1]
 
-BLUHOST = os.environ.get('BLUHOST')
-BLUUSER = os.environ.get('BLUUSER')
-BLUPW = os.environ.get('BLUPW')
-if (not BLUUSER or not BLUPW or not BLUHOST): sys.exit("BLUUSER and BLUPW variables must be defined")
+DASHDBHOST = os.environ.get('DASHDBHOST')
+DASHDBUSR = os.environ.get('DASHDBUSR')
+DASHDBPW = os.environ.get('DASHDBPW')
+if (not DASHDBUSR or not DASHDBPW or not DASHDBHOST): sys.exit("DASHDBUSR and DASHDBPW variables must be defined")
 
-auth = HTTPBasicAuth(BLUUSER, BLUPW)
+auth = HTTPBasicAuth(DASHDBUSR, DASHDBPW)
 
-print("Uploading {0} to {1} apps directory on {2}".format(upload_file, BLUUSER, BLUHOST))
+print("Uploading {0} to {1} apps directory on {2}".format(upload_file, DASHDBUSR, DASHDBHOST))
 
 upload = {'file1': ('toree.jar', open(upload_file, 'rb')) }
 
 try:
-	resp = requests.post("https://{0}:8443/dashdb-api/home/spark/apps".format(BLUHOST),
+	resp = requests.post("https://{0}:8443/dashdb-api/home/spark/apps".format(DASHDBHOST),
 		files = upload, auth=auth, verify=False)
 except requests.exceptions.ConnectionError:
-	sys.exit("Could not connect to dashDB server {0}".format(BLUHOST))
+	sys.exit("Could not connect to dashDB server {0}".format(DASHDBHOST))
 
 if (resp.status_code != requests.codes.ok and
 		resp.json().get('resultCode') != 'SUCCESS'):
