@@ -1,0 +1,10 @@
+{
+  "display_name": "IDAX - Python",
+  "language": "python",
+  "argv": [
+    "/opt/conda/share/jupyter/kernels/run-toree.py",
+    "{connection_file}",
+    "--default-interpreter",
+    "PySpark"
+  ]
+}
