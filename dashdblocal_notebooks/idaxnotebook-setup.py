@@ -14,7 +14,8 @@ upload_file = sys.argv[1]
 DASHDBHOST = os.environ.get('DASHDBHOST')
 DASHDBUSR = os.environ.get('DASHDBUSR')
 DASHDBPW = os.environ.get('DASHDBPW')
-if (not DASHDBUSR or not DASHDBPW or not DASHDBHOST): sys.exit("DASHDBUSR and DASHDBPW variables must be defined")
+if(not DASHDBHOST): DASHDBHOST='localhost'; print("Using default localhost for DASHDBHOST")
+if (not DASHDBUSR or not DASHDBPW): sys.exit("DASHDBUSR and DASHDBPW variables must be defined")
 
 auth = HTTPBasicAuth(DASHDBUSR, DASHDBPW)
 
