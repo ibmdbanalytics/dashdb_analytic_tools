@@ -5,11 +5,27 @@ USER root
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    unzip zip
+    unzip zip 
+
+RUN wget https://bintray.com/artifact/download/sbt/debian/sbt-0.13.11.deb && \
+    apt-get -y install default-jre-headless && \
+    dpkg -i sbt-0.13.11.deb && \
+    apt-get -y update && \
+    apt-get -y install sbt && \
+    sbt about && \
+    wget www.scala-lang.org/files/archive/scala-2.11.8.deb && \
+    dpkg -i scala-2.11.8.deb && \
+    apt-get -y update && \
+    apt-get -y install scala && \
+    mkdir -p /root/sparkapp/src/main/java /root/sparkapp/src/main/resources /root/sparkapp/src/main/scala/com/ibm/idax/spark/examples
 
 USER jovyan
 
+COPY build.sbt.template build.sbt.template 
+COPY build.sh build.sh 
+
 RUN mkdir -p /opt/conda/share/jupyter/kernels/idax-scala /opt/conda/share/jupyter/kernels/idax-python
+RUN mkdir -p sparkapp/src/main/java sparkapp/src/main/resources sparkapp/src/main/scala/com/ibm/idax/spark/examples
 
 RUN pip install --pre toree
 

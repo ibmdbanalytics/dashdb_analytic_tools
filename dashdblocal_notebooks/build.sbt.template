@@ -1,0 +1,15 @@
+name := "<appname>"
+ 
+version := "1.0"
+ 
+scalaVersion := "2.11.8"
+ 
+libraryDependencies ++= {
+    val sparkVersion =  "1.6.1"
+    Seq(
+        "org.apache.spark" %% "spark-core" % sparkVersion,
+        "org.apache.spark" %% "spark-sql" % sparkVersion,
+        "org.apache.spark" %% "spark-repl" % sparkVersion,
+        "org.apache.spark" %% "spark-mllib" % sparkVersion
+    )
+}
