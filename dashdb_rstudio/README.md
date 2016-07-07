@@ -23,7 +23,8 @@ Follow these steps to get your own Docker container instance:
     1. Select the package **IBM Data Server Driver Package (DS Driver)**.
     2. Log in with your IBM ID (sign-up is free).
     3. Select the offering **IBM Data Server Driver Package (Linux AMD64 and Intel EM64T)** for the Linux platform.
-  * Make sure the downloaded file is really named **ibm_data_server_driver_package_linuxx64_v10.5.tar.gz**. Rename it if this is not the case before you continue with the build process.
+  * Make sure the downloaded file is really named **ibm_data_server_driver_package_linuxx64_v10.5.tar.gz**. Rename it if this is not the case before you continue with the build process. Be aware that *.gz files will be automatically extracted on some operation systems (OS X), however it is necessary to use the gziped compressed package.
+  
 4. As a user with root authority, build the image:
   * If you want to build the image and run the container in your own Linux environment, issue these commands:
     - `docker build -t <image name> <path to your dashdb_rstudio directory>`
