@@ -42,9 +42,6 @@ COPY kernel-scala.json /opt/conda/share/jupyter/kernels/idax-scala/kernel.json
 COPY kernel-python.json /opt/conda/share/jupyter/kernels/idax-python/kernel.json
 COPY idaxnotebook-setup.py launch-with-idax.sh /usr/local/bin/
 
-# default host for dashDB connection
-ENV BLUHOST 127.0.0.1
-
 # put our setup on top of the base image startup script
 CMD ["launch-with-idax.sh"]
 
