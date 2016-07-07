@@ -5,27 +5,23 @@ USER root
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    unzip zip 
+    unzip zip default-jre-headless 
 
-RUN wget https://bintray.com/artifact/download/sbt/debian/sbt-0.13.11.deb && \
-    apt-get -y install default-jre-headless && \
-    dpkg -i sbt-0.13.11.deb && \
-    apt-get -y update && \
-    apt-get -y install sbt && \
-    sbt about && \
-    wget www.scala-lang.org/files/archive/scala-2.11.8.deb && \
-    dpkg -i scala-2.11.8.deb && \
-    apt-get -y update && \
-    apt-get -y install scala && \
-    mkdir -p /root/sparkapp/src/main/java /root/sparkapp/src/main/resources /root/sparkapp/src/main/scala/com/ibm/idax/spark/examples
+# sbt is not in repo for Trusty 
+RUN wget -nv https://bintray.com/artifact/download/sbt/debian/sbt-0.13.11.deb
+# default version of Scala for Trusty is too old, need 2.11 for Spark
+RUN wget -nv www.scala-lang.org/files/archive/scala-2.11.8.deb
 
+RUN dpkg -i sbt-0.13.11.deb scala-2.11.8.deb
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    sbt scala
+    
 USER jovyan
 
-COPY build.sbt.template build.sbt.template 
-COPY build.sh build.sh 
-
 RUN mkdir -p /opt/conda/share/jupyter/kernels/idax-scala /opt/conda/share/jupyter/kernels/idax-python
-RUN mkdir -p sparkapp/src/main/java sparkapp/src/main/resources sparkapp/src/main/scala/com/ibm/idax/spark/examples
+RUN mkdir -p sparkapp/src/main/java sparkapp/src/main/resources sparkapp/src/main/scala
 
 RUN pip install --pre toree
 
@@ -41,6 +37,9 @@ COPY run-toree.py /opt/conda/share/jupyter/kernels/
 COPY kernel-scala.json /opt/conda/share/jupyter/kernels/idax-scala/kernel.json
 COPY kernel-python.json /opt/conda/share/jupyter/kernels/idax-python/kernel.json
 COPY idaxnotebook-setup.py launch-with-idax.sh /usr/local/bin/
+COPY build.sbt.template build.sbt.template 
+COPY build.sh build.sh 
+
 
 # put our setup on top of the base image startup script
 CMD ["launch-with-idax.sh"]
