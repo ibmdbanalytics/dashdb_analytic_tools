@@ -28,5 +28,9 @@ RUN rm -rf /var/lib/apt/lists/ \
 
 ADD samples /home/rstudio/samples
 
+## Copy and call startup script
+COPY startup.sh /tmp/startup.sh
+CMD ["/bin/bash", "/tmp/startup.sh"]
+
 ## Add ssh deamon to startup sequence
 ##RUN cat /supervisor.conf >> /etc/supervisor/conf.d/supervisord.conf
