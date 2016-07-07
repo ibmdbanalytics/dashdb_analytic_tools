@@ -5,11 +5,30 @@ USER root
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    unzip zip
+    unzip zip default-jre-headless 
+
+# sbt is not in repo for Trusty 
+RUN cd /tmp && \
+	wget -nv https://bintray.com/artifact/download/sbt/debian/sbt-0.13.11.deb && \
+	dpkg -i sbt-0.13.11.deb && \
+	rm *.deb
+
+# don't need to download a debian packaged scala interpreter; sbt will get all we need
+# wget -nv www.scala-lang.org/files/archive/scala-2.11.8.deb
+
 
 USER jovyan
 
+COPY build.sh build.sh 
+
+# need to define correct scalaVersion and dependencies for Spark before we start downloading 
+COPY build.sbt.template build.sbt 
+# first start of sbt downloads mvn dependencies
+RUN sbt about
+
+
 RUN mkdir -p /opt/conda/share/jupyter/kernels/idax-scala /opt/conda/share/jupyter/kernels/idax-python
+RUN mkdir -p sparkapp/src/main/java sparkapp/src/main/resources sparkapp/src/main/scala
 
 RUN pip install --pre toree
 
