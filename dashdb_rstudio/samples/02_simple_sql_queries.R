@@ -2,7 +2,7 @@ library(ibmdbR)
 
 ######################################################################
 ## Set the connection information corresponding to you dashDB instance
-## You will find the connection informatation 
+## You will find the connection information 
 ## under Connect -> Connection Information in the dashDB web ui
 ######################################################################
 host.name <- ""

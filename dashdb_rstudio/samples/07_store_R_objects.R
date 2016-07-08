@@ -2,13 +2,19 @@ library(ibmdbR)
 
 ######################################################################
 ## Set the connection information corresponding to you dashDB instance
-## You will find the connection informatation 
+## You will find the connection information 
 ## under Connect -> Connection Information in the dashDB web ui
 ######################################################################
 host.name <- ""
 user.name <-""
 pwd <- ""
 ######################################################################
+
+if((nchar(host.name)==0)||(nchar(user.name)==0)||(nchar(pwd)==0))
+	stop("Please specify the host.name, user.name and pwd by setting the variables above.")
+
+con <- idaConnect(paste("DASHDB",";Database=BLUDB;Hostname=",host.name,";Port=50000;PROTOCOL=TCPIP;UID=", user.name,";PWD=",pwd,sep=""),"","")
+idaInit(con)
 
 # Create a pointer to the private R object storage table of the current user.
 myPrivateObjects <- ida.list(type='private')
@@ -21,14 +27,18 @@ myPrivateObjects['series100'] <- 1:100
 # private R object storage table of the current user.
 x <- myPrivateObjects['series100']
 
-
-# Delete the object with name 'series100' from the 
-# private R object storage table of the current user.
-
-myPrivateObjects['series100'] <- NULL
+# Print object
+x
 
 # List all objects in the private R object storage table of the current user.
 names(myPrivateObjects)
+
+# Return the number of objects in the private R object storage table of the current user.
+length(myPrivateObjects)
+
+# Delete the object with name 'series100' from the 
+# private R object storage table of the current user.
+myPrivateObjects['series100'] <- NULL
 
 # Return the number of objects in the private R object storage table of the current user.
 length(myPrivateObjects)
@@ -40,4 +50,3 @@ length(myPrivateObjects)
 
 #Close the connection
 idaClose(con)
-
