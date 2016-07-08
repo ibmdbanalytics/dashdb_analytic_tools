@@ -57,9 +57,9 @@ Most samples upload their own data, however some expect the following tables to 
    * [SHOWCASE_SYSUSAGE.csv] (./SHOWCASE_SYSUSAGE.csv)
    * [SHOWCASE_SYSTEMS.csv] (./SHOWCASE_SYSTEMS.csv)
 2. Load the contents of these CSV files into the following tables in your database:
-   * SAMPLES.SHOWCASE_SYSTYPES 
-   * SAMPLES.SHOWCASE_SYSUSAGE 
-   * SAMPLES.SHOWCASE_SYSTEMS
+   * SHOWCASE_SYSTYPES 
+   * SHOWCASE_SYSUSAGE 
+   * SHOWCASE_SYSTEMS
 
 If you choose different table names, modify the script to reflect these different names. 
 
