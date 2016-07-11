@@ -57,15 +57,15 @@ idaInit(con)
 #   USERS    Number of active users on the system 
 #   MEMUSED  Memory usage 
 #   ALERT    Whether an alert was triggered 
-sysusage<-ida.data.frame('SAMPLES.SHOWCASE_SYSUSAGE')
+sysusage<-ida.data.frame('SHOWCASE_SYSUSAGE')
 
 # Create a ida data frame that refers to the table SHOWCASE_SYSTEMS, which contains additional 
 # information about the systems.
-systems<-ida.data.frame('SAMPLES.SHOWCASE_SYSTEMS')
+systems<-ida.data.frame('SHOWCASE_SYSTEMS')
 
 # Create a ida data frame that refers to the table SHOWCASE_SYSTYPES, which contains information 
 # about the system types.
-systypes<-ida.data.frame('SAMPLES.SHOWCASE_SYSTYPES')
+systypes<-ida.data.frame('SHOWCASE_SYSTYPES')
 
 # Display the first few rows of each of these tables.
 writeLines("Excerpt from SHOWCASE_SYSUSAGE:")
