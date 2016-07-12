@@ -26,10 +26,6 @@ COPY build.sbt.template build.sbt
 # first start of sbt downloads mvn dependencies
 RUN sbt about
 
-
-RUN mkdir -p /home/$NB_USER/.local/share/jupyter/kernels/{idax-scala,idax-python}
-RUN mkdir -p sparkapp/src/main/{java,scala,resources}
-
 RUN pip install --pre toree
 
 
@@ -43,11 +39,12 @@ RUN cd /tmp && \
 	zip -r /usr/local/lib/toree.jar log4j.properties
 RUN rm /tmp/log4j.properties
 
-COPY kernel-scala.json /opt/conda/share/jupyter/kernels/idax-scala/kernel.json
-COPY kernel-python.json /opt/conda/share/jupyter/kernels/idax-python/kernel.json
+COPY kernel-scala.json /home/$NB_USER/.local/share/jupyter/kernels/idax-scala/kernel.json
+COPY kernel-python.json /home/$NB_USER/.local/share/jupyter/kernels/idax-python/kernel.json
 COPY idaxnotebook-setup.py run-toree.py launch-with-idax.sh /usr/local/bin/
 
-RUN mkdir notebooks
+RUN bash -c "mkdir -p sparkapp/src/main/{java,scala,resources}"
+
 COPY Spark_KMeansSample.ipynb notebooks/
 
 # don't rely on github to preserve exec permissions, set them explicitly
