@@ -27,6 +27,7 @@ COPY build.sbt.template build.sbt
 RUN sbt about
 
 RUN pip install --pre toree
+RUN pip install jupyter_cms
 
 
 USER root
@@ -54,6 +55,14 @@ RUN chown -R $NB_USER /home/$NB_USER
 
 
 USER $NB_USER
+
+#ADD src /src
+#RUN pip install /src/sparkapp_bundler
+
+RUN jupyter cms quick-setup --sys-prefix
+#RUN jupyter serverextension enable --py jupyter_cms_sparkapp --sys-prefix
+#RUN jupyter bundler enable --py jupyter_cms_sparkapp --sys-prefix
+
 
 # put our setup on top of the base image startup script
 CMD ["launch-with-idax.sh"]
