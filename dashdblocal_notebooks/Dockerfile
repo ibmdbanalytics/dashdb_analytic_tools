@@ -17,7 +17,7 @@ RUN cd /tmp && \
 # wget -nv www.scala-lang.org/files/archive/scala-2.11.8.deb
 
 
-USER jovyan
+USER $NB_USER
 
 COPY build.sh build.sh 
 
@@ -27,24 +27,36 @@ COPY build.sbt.template build.sbt
 RUN sbt about
 
 
-RUN mkdir -p /opt/conda/share/jupyter/kernels/idax-scala /opt/conda/share/jupyter/kernels/idax-python
-RUN mkdir -p sparkapp/src/main/java sparkapp/src/main/resources sparkapp/src/main/scala
+RUN mkdir -p /home/$NB_USER/.local/share/jupyter/kernels/{idax-scala,idax-python}
+RUN mkdir -p sparkapp/src/main/{java,scala,resources}
 
 RUN pip install --pre toree
 
+
+USER root
+
 # modify log4.properties in toree so we get Spark INFO output expected by dashDB Spark support
-RUN	cp /opt/conda/lib/python3.5/site-packages/toree/lib/toree-assembly-*.jar /opt/conda/share/jupyter/kernels/toree.jar
+RUN	cp /opt/conda/lib/python3.5/site-packages/toree/lib/toree-assembly-*.jar /usr/local/lib/toree.jar
 RUN cd /tmp && \
-	unzip /opt/conda/share/jupyter/kernels/toree.jar log4j.properties && \
+	unzip /usr/local/lib/toree.jar log4j.properties && \
 	echo "log4j.logger.org.apache.spark=INFO" >> log4j.properties && \
-	zip -r /opt/conda/share/jupyter/kernels/toree.jar log4j.properties
+	zip -r /usr/local/lib/toree.jar log4j.properties
 RUN rm /tmp/log4j.properties
 
-COPY run-toree.py /opt/conda/share/jupyter/kernels/
 COPY kernel-scala.json /opt/conda/share/jupyter/kernels/idax-scala/kernel.json
 COPY kernel-python.json /opt/conda/share/jupyter/kernels/idax-python/kernel.json
-COPY idaxnotebook-setup.py launch-with-idax.sh /usr/local/bin/
+COPY idaxnotebook-setup.py run-toree.py launch-with-idax.sh /usr/local/bin/
+
+RUN mkdir notebooks
+COPY Spark_KMeansSample.ipynb notebooks/
+
+# don't rely on github to preserve exec permissions, set them explicitly
+RUN chmod a+x /usr/local/bin/*
+# fix ownership for all files in homedir
+RUN chown -R $NB_USER /home/$NB_USER 
+
+
+USER $NB_USER
 
 # put our setup on top of the base image startup script
 CMD ["launch-with-idax.sh"]
-
