@@ -28,11 +28,11 @@ def build_scala_project(project_dir, appname):
     with the given application name.
     Return the name of the generated JAR'''
             
-    with open(project_dir+"/../build.sbt", "rt") as buildfile_in:
+    with open(project_dir+"/../build.sbt.template", "rt") as buildfile_in:
         with open(project_dir+"/build.sbt", "wt") as buildfile_out:
             for line in buildfile_in:
                 buildfile_out.write(line.replace('<appname>', appname))
-    call(["sbt", "-mem", "256", "clean", "package"], cwd=APPDIR)
+    call(["./build.sh"], cwd=APPDIR)
     
     jars = glob.glob(project_dir + "/target/**/*.jar")
     assert len(jars) == 1, "Expected exactly one output JAR bout found {0}".format(','.join(jars))
@@ -67,8 +67,8 @@ def bundle(handler, absolute_notebook_path):
     :param absolute_notebook_path: The path of the notebook on disk
     '''
 
-    #TEMPORARY for development
-    absolute_notebook_path = '/home/jovyan/work/notebooks/Spark_KMeansSample.ipynb'
+    #TEMPORARY hardcode path for development
+    #absolute_notebook_path = '/home/jovyan/work/notebooks/Spark_KMeansSample.ipynb'
     notebook_filename = os.path.splitext(os.path.basename(absolute_notebook_path))[0]
     
     export_to_scalafile(absolute_notebook_path, SOURCEFILE)
@@ -91,4 +91,5 @@ def bundle(handler, absolute_notebook_path):
     
     with open(archive_path, "rb") as data:
         handler.write(data.read())
+    print("export complete")
     handler.finish()
