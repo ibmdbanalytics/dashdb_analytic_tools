@@ -19,15 +19,15 @@ RUN cd /tmp && \
 
 USER $NB_USER
 
-COPY build.sh build.sh 
-
+# first start of sbt downloads maven dependencies -- do that early in the docker buid process
 # need to define correct scalaVersion and dependencies for Spark before we start downloading 
-COPY build.sbt.template build.sbt 
-# first start of sbt downloads mvn dependencies
-RUN sbt about
+COPY build.sbt.template tmp/build.sbt 
+RUN cd tmp && sbt about
 
+# set up jupyter environment
 RUN pip install --pre toree
 RUN pip install jupyter_cms
+RUN jupyter cms quick-setup --sys-prefix
 
 
 USER root
@@ -40,12 +40,11 @@ RUN cd /tmp && \
 	zip -r /usr/local/lib/toree.jar log4j.properties
 RUN rm /tmp/log4j.properties
 
+# copy other files late in the build to avoid cache busting
+COPY build.sbt.template build.sh ./
 COPY kernel-scala.json /home/$NB_USER/.local/share/jupyter/kernels/idax-scala/kernel.json
 COPY kernel-python.json /home/$NB_USER/.local/share/jupyter/kernels/idax-python/kernel.json
-COPY idaxnotebook-setup.py run-toree.py launch-with-idax.sh /usr/local/bin/
-
-RUN bash -c "mkdir -p sparkapp/src/main/{java,scala,resources}"
-
+COPY upload-sparkapp.py run-sparkapp.py run-toree.py launch-with-idax.sh /usr/local/bin/
 COPY Spark_KMeansSample.ipynb notebooks/
 
 # don't rely on github to preserve exec permissions, set them explicitly
@@ -53,15 +52,18 @@ RUN chmod a+x /usr/local/bin/*
 # fix ownership for all files in homedir
 RUN chown -R $NB_USER /home/$NB_USER 
 
-
 USER $NB_USER
 
-#ADD src /src
-#RUN pip install /src/sparkapp_bundler
+# set up template project
+RUN bash -c "mkdir -p sparkapp/src/main/{java,scala,resources}" && \
+	cp /usr/local/bin/*-sparkapp.py sparkapp/ && \
+	cp build.sh sparkapp/
 
-RUN jupyter cms quick-setup --sys-prefix
-#RUN jupyter serverextension enable --py jupyter_cms_sparkapp --sys-prefix
-#RUN jupyter bundler enable --py jupyter_cms_sparkapp --sys-prefix
+ADD src /src
+RUN pip install /src/sparkapp_bundler
+
+RUN jupyter serverextension enable --py jupyter_cms_sparkapp --sys-prefix
+RUN jupyter bundler enable --py jupyter_cms_sparkapp --sys-prefix
 
 
 # put our setup on top of the base image startup script

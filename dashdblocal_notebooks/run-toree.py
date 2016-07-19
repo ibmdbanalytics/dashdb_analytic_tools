@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import warnings
-import _thread, sys, os, socket,time
+import _thread, sys, os, socket, time
 import signal, atexit
 import json, requests
 from requests.auth import HTTPBasicAuth
@@ -33,7 +33,7 @@ def upload_conn_info(conn_file_name, conn_file_content):
 	upload = { conn_file_name: json.dumps(conn_file_content) }
 	resp = session.post("https://{0}:8443/dashdb-api/home/tmp".format(DASHDBHOST),
 					files = upload, auth=auth, verify=False)
-	if (resp.status_code != requests.codes.ok and
+	if (resp.status_code != requests.codes.ok or
 			resp.json().get('resultCode') != 'SUCCESS'): 
 		sys.exit ("Failed to upload communication file " + conn_file_in)
 	print("Upload complete: " + resp.text)
@@ -51,7 +51,7 @@ def start_kernel(toree_args):
 		json=req_data, auth=auth, verify=False)
 
 	if (resp.status_code != requests.codes.ok): 
-		sys.exit ("Failed to submit Spark kernel job: " + resp.text)
+		sys.exit ("Failed to submit Spark kernel job: " + resp)
 	resp_data = resp.json()
 	if (resp_data.get('status') != 'submitted'):
 		sys.exit ("Failed to submit Spark kernel job: " + resp.text)
