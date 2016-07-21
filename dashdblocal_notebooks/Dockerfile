@@ -24,7 +24,7 @@ COPY build.sh build.sh
 # need to define correct scalaVersion and dependencies for Spark before we start downloading 
 COPY build.sbt.template build.sbt 
 # first start of sbt downloads mvn dependencies
-RUN sbt about
+#RUN sbt about
 
 RUN pip install --pre toree
 
