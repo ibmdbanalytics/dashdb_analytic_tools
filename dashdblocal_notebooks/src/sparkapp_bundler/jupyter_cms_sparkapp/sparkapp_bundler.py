@@ -1,3 +1,6 @@
+# (c) Copyright IBM Corporation 2016   
+# LICENSE: Apache V2, https://opensource.org/licenses/Apache-2.0
+
 import os, io, glob, json, zipfile
 from subprocess import call
 from shutil import make_archive
