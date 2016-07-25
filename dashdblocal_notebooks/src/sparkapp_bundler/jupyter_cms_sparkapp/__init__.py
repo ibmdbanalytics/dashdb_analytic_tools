@@ -4,10 +4,16 @@
 def _jupyter_bundler_paths():
     '''API for notebook bundler installation on notebook 4.2'''
     return [{
-            'name': 'sparkapp_bundler',
-            'label': 'export as Spark SBT project (.zip)',
-            'module_name': 'jupyter_cms_sparkapp.sparkapp_bundler',
+            'name': 'spark_project_download',
+            'label': 'Spark SBT project (.zip)',
+            'module_name': 'jupyter_cms_sparkapp.sbt_project_download',
             'group': 'download'
+    },
+    {
+            'name': 'sparkapp_dashdb_upload',
+            'label': 'Deploy to dashDB Spark',
+            'module_name': 'jupyter_cms_sparkapp.sparkapp_upload',
+            'group': 'deploy'
     }]
         
 def _jupyter_server_extension_paths():
