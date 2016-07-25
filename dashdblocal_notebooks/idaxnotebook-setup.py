@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# (c) Copyright IBM Corporation 2016   
+# LICENSE: Apache V2, https://opensource.org/licenses/Apache-2.0
+
 
 # Upload Toree kernel to dashDB local via REST API
 

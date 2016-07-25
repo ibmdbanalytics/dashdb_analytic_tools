@@ -1,3 +1,6 @@
+# (c) Copyright IBM Corporation 2016   
+# LICENSE: Apache V2, https://opensource.org/licenses/Apache-2.0
+
 FROM jupyter/base-notebook
 # tested with jupyter/base-notebook ID 27f6af6e1dcc
 
@@ -19,12 +22,15 @@ RUN cd /tmp && \
 
 USER $NB_USER
 
-COPY build.sh build.sh 
-
-# need to define correct scalaVersion and dependencies for Spark before we start downloading 
-COPY build.sbt.template build.sbt 
-# first start of sbt downloads mvn dependencies
-#RUN sbt about
+# first start of sbt downloads maven dependencies -- do that early in the docker buid process
+# need to define correct scalaVersion and dependencies for Spark before we start downloading
+RUN mkdir tmp
+COPY build.sbt.template tmp/build.sbt 
+#RUN cd tmp &&  \
+#	mkdir -p src/main/scala && \
+#	echo "object Dummy {}" > src/main/scala/Dummy.scala && \
+#	echo "Note: downloading sbt may seem to be stuck for a few minutes, be patient" && \
+#	sbt package
 
 RUN pip install --pre toree
 
@@ -39,6 +45,7 @@ RUN cd /tmp && \
 	zip -r /usr/local/lib/toree.jar log4j.properties
 RUN rm /tmp/log4j.properties
 
+COPY build.sbt.template build.sh ./
 COPY kernel-scala.json /home/$NB_USER/.local/share/jupyter/kernels/idax-scala/kernel.json
 COPY kernel-python.json /home/$NB_USER/.local/share/jupyter/kernels/idax-python/kernel.json
 COPY idaxnotebook-setup.py run-toree.py launch-with-idax.sh /usr/local/bin/
