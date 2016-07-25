@@ -30,8 +30,8 @@ def export_to_scalafile(absolute_notebook_path, scala_source):
     with open(scala_source, 'wt') as sourcefile:
         sourcefile.write(scalacode)
 
-        
-def build_scala_project(project_dir, appname):
+
+def build_scala_project(handler, project_dir, scalafile, appname):
     '''build the given scala project, replacing the <appname> tag in build.sbt.template
     with the given application name.
     Return the name of the generated JAR'''
@@ -40,11 +40,29 @@ def build_scala_project(project_dir, appname):
         with open(project_dir+"/build.sbt", "wt") as buildfile_out:
             for line in buildfile_in:
                 buildfile_out.write(line.replace('<appname>', appname))
-    subprocess.run(["./build.sh"], cwd=project_dir, check=True)
-    
+    build = subprocess.run(["./build.sh"], cwd=project_dir, 
+                           stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    if (build.returncode != 0):
+        show_build_error(handler, build.stdout, scalafile)
+        return None
+
     jars = glob.glob(project_dir + "/target/**/*.jar")
     assert len(jars) == 1, "Expected exactly one output JAR bout found {0}".format(','.join(jars))
     return jars[0]
+
+
+def show_build_error(handler, errmsg, scalafile):
+    handler.set_header('Content-Type', 'text/plain; charset=us-ascii ')
+    handler.write("SBT build failed!\n\n")
+    for line in errmsg.splitlines(True):
+        # strip all the dependency resolution info from the error output
+        if not line.startswith(b"[info] Resolving "):
+            handler.write(line)
+    handler.write("\n\nScala source generated from notebook:\n\n")
+    with open(scalafile, "rt") as source:
+        for (n, line) in enumerate(source, 1):
+            handler.write("{0:>5}:  {1}".format(n, line))
+    handler.finish()
 
 
 def add_launcher_scripts(project_dir, jarfile, appname):

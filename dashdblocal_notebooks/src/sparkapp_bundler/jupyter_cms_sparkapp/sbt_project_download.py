@@ -23,15 +23,14 @@ def bundle(handler, absolute_notebook_path):
     :param absolute_notebook_path: The path of the notebook on disk
     '''
 
-    #TEMPORARY hardcode path for development
-    #absolute_notebook_path = '/home/jovyan/work/notebooks/Spark_KMeansSample.ipynb'
     notebook_filename = os.path.splitext(os.path.basename(absolute_notebook_path))[0]
     
     export_to_scalafile(absolute_notebook_path, SOURCEFILE)
     print("noteboook exported to {0}".format(SOURCEFILE))
 
     print("building scala application in {0}...".format(APPDIR))
-    jarfile = build_scala_project(APPDIR, notebook_filename)
+    jarfile = build_scala_project(handler, APPDIR, SOURCEFILE, notebook_filename)
+    if not jarfile: return
     print("created jar file {0}".format(jarfile))
     
     relpath = os.path.relpath(jarfile, APPDIR)

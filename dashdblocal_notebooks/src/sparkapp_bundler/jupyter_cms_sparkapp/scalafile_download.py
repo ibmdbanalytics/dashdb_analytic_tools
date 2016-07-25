@@ -21,6 +21,6 @@ def bundle(handler, absolute_notebook_path):
     scalacode = export_to_scala(absolute_notebook_path)
 
     handler.set_header('Content-Type', 'text/plain; charset=us-ascii ')
-    for (n, line) in enumerate(scalacode.splitlines(), 1):
-        handler.write("{0:>5}:  {1}\n".format(n, line))
+    for (n, line) in enumerate(scalacode.splitlines(True), 1):
+        handler.write("{0:>5}:  {1}".format(n, line))
     handler.finish()

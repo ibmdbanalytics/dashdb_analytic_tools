@@ -35,24 +35,27 @@ def bundle(handler, absolute_notebook_path):
     print("noteboook exported to {0}".format(SOURCEFILE))
 
     print("building scala application in {0}...".format(APPDIR))
-    jarfile = build_scala_project(APPDIR, notebook_filename)
+    jarfile = build_scala_project(handler, APPDIR, SOURCEFILE, notebook_filename)
+    if not jarfile: return
     print("created jar file {0}".format(jarfile))
     
     upload = subprocess.run(["upload-sparkapp.py", jarfile], 
                             stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     
     handler.set_header('Content-Type', 'text/plain; charset=us-ascii ')
-    if (upload.returncode == 0):
-        resource = os.path.basename(jarfile)
-        handler.write("Success!\n\n")
-        handler.write(upload.stdout)
-        handler.write("\n\nTo start your spark application, you can set DASHDBPW and use the following command:\n\n"
-                      "curl -k -v -u {0}:$DASHDBPW -XPOST https://{1}:8443/clues/public/jobs/submit \\\n"
-                      "--header 'Content-Type:application/json;charset=UTF-8'  \\\n"
-                      "--data '{{ \"appResource\" : \"{2}\", \"mainClass\" : \"SampleApp\" }}'\n"
-                      .format(DASHDBUSR, DASHDBHOST, resource))
-    else:
+    if (upload.returncode != 0):
         handler.write("Failed!\n\n")
         handler.write(upload.stdout)
+        handler.finish()
+        return
 
+    resource = os.path.basename(jarfile)
+    handler.write("Success!\n\n")
+    handler.write(upload.stdout)
+    handler.write("\n\nTo start your spark application, you can set DASHDBPW and use the following command:\n\n"
+                  "curl -k -v -u {0}:$DASHDBPW -XPOST https://{1}:8443/clues/public/jobs/submit \\\n"
+                  "--header 'Content-Type:application/json;charset=UTF-8'  \\\n"
+                  "--data '{{ \"appResource\" : \"{2}\", \"mainClass\" : \"SampleApp\" }}'\n"
+                  .format(DASHDBUSR, DASHDBHOST, resource))
     handler.finish()
+
