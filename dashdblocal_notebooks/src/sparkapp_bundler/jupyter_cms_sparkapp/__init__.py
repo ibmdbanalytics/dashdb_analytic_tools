@@ -4,6 +4,12 @@
 def _jupyter_bundler_paths():
     '''API for notebook bundler installation on notebook 4.2'''
     return [{
+            'name': 'scalafile_download',
+            'label': 'Scala class (in browser)',
+            'module_name': 'jupyter_cms_sparkapp.scalafile_download',
+            'group': 'download'
+    },
+    {
             'name': 'spark_project_download',
             'label': 'Spark SBT project (.zip)',
             'module_name': 'jupyter_cms_sparkapp.sbt_project_download',

@@ -11,6 +11,9 @@ HOME = os.getenv('HOME')
 APPDIR = HOME + '/work/sparkapp'
 SOURCEFILE = APPDIR + '/src/main/scala/notebook.scala'
 
+DASHDBHOST = os.environ.get('DASHDBHOST')
+DASHDBUSR = os.environ.get('DASHDBUSR')
+
 
 @gen.coroutine
 def bundle(handler, absolute_notebook_path):
@@ -25,7 +28,7 @@ def bundle(handler, absolute_notebook_path):
     '''
 
     #TEMPORARY hardcode path for development
-    absolute_notebook_path = '/home/jovyan/work/notebooks/Spark_KMeansSample.ipynb'
+    #absolute_notebook_path = '/home/jovyan/work/notebooks/Spark_KMeansSample.ipynb'
     notebook_filename = os.path.splitext(os.path.basename(absolute_notebook_path))[0]
     
     export_to_scalafile(absolute_notebook_path, SOURCEFILE)
@@ -37,10 +40,17 @@ def bundle(handler, absolute_notebook_path):
     
     upload = subprocess.run(["upload-sparkapp.py", jarfile], 
                             stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    
     handler.set_header('Content-Type', 'text/plain; charset=us-ascii ')
     if (upload.returncode == 0):
+        resource = os.path.basename(jarfile)
         handler.write("Success!\n\n")
         handler.write(upload.stdout)
+        handler.write("\n\nTo start your spark application, you can set DASHDBPW and use the following command:\n\n"
+                      "curl -k -v -u {0}:$DASHDBPW -XPOST https://{1}:8443/clues/public/jobs/submit \\\n"
+                      "--header 'Content-Type:application/json;charset=UTF-8'  \\\n"
+                      "--data '{{ \"appResource\" : \"{2}\", \"mainClass\" : \"SampleApp\" }}'\n"
+                      .format(DASHDBUSR, DASHDBHOST, resource))
     else:
         handler.write("Failed!\n\n")
         handler.write(upload.stdout)

@@ -4,18 +4,31 @@
 import os, io, glob, json, subprocess
 from nbconvert import TemplateExporter
 from jinja2 import FileSystemLoader
+from nbconvert.preprocessors import Preprocessor
+from nbconvert import preprocessors
 
 INSTALLDIR = os.path.dirname(os.path.realpath(__file__))
+
+# marker indicating code cells that should not be added to the Spark application
+FILTER_CELL_MARKER = "//NOT-FOR-APP"
+
+
+def export_to_scala(absolute_notebook_path):
+    '''convert the notebook source to scala'''
+    
+    exporter = TemplateExporter(extra_loaders=[FileSystemLoader(INSTALLDIR)],
+                                preprocessors=[ScalaAppPreprocessor])
+    exporter.template_file = 'scala_sparkapp'
+    (body, resources) = exporter.from_file(absolute_notebook_path)
+    return body
 
 
 def export_to_scalafile(absolute_notebook_path, scala_source):
     '''convert the notebook source to scala and save it into the given filename'''
     
-    exporter = TemplateExporter(extra_loaders=[FileSystemLoader(INSTALLDIR)])
-    exporter.template_file = 'scala_sparkapp'
-    (body, resources) = exporter.from_file(absolute_notebook_path)
+    scalacode = export_to_scala(absolute_notebook_path)
     with open(scala_source, 'wt') as sourcefile:
-        sourcefile.write(body)
+        sourcefile.write(scalacode)
 
         
 def build_scala_project(project_dir, appname):
@@ -48,3 +61,14 @@ def add_launcher_scripts(project_dir, jarfile, appname):
         script.write("#!/bin/sh\n")
         script.write("./run-sparkapp.py '{0}'\n".format(json.dumps(submit_spec)))
     os.chmod(scriptfile, 0o755)
+
+
+class ScalaAppPreprocessor(Preprocessor):
+    """A preprocessor to remove some of the cells of a notebook"""
+    
+    def keepCell(self, cell):
+        return not cell.source.startswith(FILTER_CELL_MARKER)
+
+    def preprocess(self, nb, resources):
+        nb.cells = filter(self.keepCell, nb.cells)
+        return nb, resources    
