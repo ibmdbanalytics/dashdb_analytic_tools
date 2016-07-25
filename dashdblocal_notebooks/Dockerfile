@@ -1,3 +1,6 @@
+# (c) Copyright IBM Corporation 2016   
+# LICENSE: Apache V2, https://opensource.org/licenses/Apache-2.0
+
 FROM jupyter/base-notebook
 # tested with jupyter/base-notebook ID 27f6af6e1dcc
 
@@ -20,9 +23,14 @@ RUN cd /tmp && \
 USER $NB_USER
 
 # first start of sbt downloads maven dependencies -- do that early in the docker buid process
-# need to define correct scalaVersion and dependencies for Spark before we start downloading 
+# need to define correct scalaVersion and dependencies for Spark before we start downloading
+RUN mkdir tmp
 COPY build.sbt.template tmp/build.sbt 
-RUN cd tmp && sbt about
+RUN cd tmp &&  \
+	mkdir -p src/main/scala && \
+	echo "object Dummy {}" > src/main/scala/Dummy.scala && \
+	echo "Note: downloading sbt may seem to be stuck for a few minutes, be patient" && \
+	sbt package
 
 # set up jupyter environment
 RUN pip install --pre toree
