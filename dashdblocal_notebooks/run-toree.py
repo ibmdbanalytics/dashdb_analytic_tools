@@ -51,7 +51,7 @@ def start_kernel(toree_args):
 		json=req_data, auth=auth, verify=False)
 
 	if (resp.status_code != requests.codes.ok): 
-		sys.exit ("Failed to submit Spark kernel job: " + resp)
+		sys.exit ("Failed to submit Spark kernel job: " + resp.text)
 	resp_data = resp.json()
 	if (resp_data.get('status') != 'submitted'):
 		sys.exit ("Failed to submit Spark kernel job: " + resp.text)
