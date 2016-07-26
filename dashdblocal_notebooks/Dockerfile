@@ -26,6 +26,9 @@ USER $NB_USER
 # need to define correct scalaVersion and dependencies for Spark before we start downloading
 RUN mkdir tmp
 COPY build.sbt.template tmp/build.sbt
+USER root
+RUN chmod -R a+rx tmp
+USER $NB_USER
 RUN cd tmp &&  \
 	mkdir -p src/main/scala && \
 	echo "object Dummy {}" > src/main/scala/Dummy.scala && \
@@ -58,8 +61,12 @@ COPY kernel-python.json /home/$NB_USER/.local/share/jupyter/kernels/idax-python/
 COPY upload-sparkapp.py run-sparkapp.py run-toree.py launch-with-idax.sh /usr/local/bin/
 COPY Spark_KMeansSample.ipynb ./
 
+# copy template project files
+ADD src /src
+RUN chmod -R a+rx /src
+
 # don't rely on github to preserve exec permissions, set them explicitly
-RUN chmod a+x /usr/local/bin/*
+RUN chmod a+rx /usr/local/bin/*
 # fix ownership for all files copied into homedir
 RUN chown -R $NB_USER /home/$NB_USER
 
@@ -70,7 +77,6 @@ RUN bash -c "mkdir -p $PROJECTS_DIR/sparkapp/src/main/{java,scala,resources}" &&
 	cp /usr/local/bin/*-sparkapp.py $PROJECTS_DIR/sparkapp/ && \
 	cp $PROJECTS_DIR/build.sh $PROJECTS_DIR/sparkapp/
 
-ADD src /src
 RUN pip install /src/sparkapp_bundler
 
 RUN jupyter serverextension enable --py jupyter_cms_sparkapp --sys-prefix
