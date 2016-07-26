@@ -5,7 +5,8 @@ import os, subprocess
 from shutil import make_archive
 from tornado import gen
 from .sparkapp_bundler import *
-from subprocess import STDOUT
+from . import SPARKAPP_LOG
+
 
 HOME = os.getenv('HOME')
 APPDIR = HOME + '/projects/sparkapp'
@@ -30,16 +31,11 @@ def bundle(handler, absolute_notebook_path):
     notebook_filename = os.path.splitext(os.path.basename(absolute_notebook_path))[0]
 
     export_to_scalafile(absolute_notebook_path, SOURCEFILE)
-    print("noteboook exported to {0}".format(SOURCEFILE))
-
-    print("building scala application in {0}...".format(APPDIR))
     jarfile = build_scala_project(handler, APPDIR, SOURCEFILE, notebook_filename)
     if not jarfile: return
-    print("created jar file {0}".format(jarfile))
 
     upload = subprocess.run(["upload-sparkapp.py", jarfile],
                             stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-
     handler.set_header('Content-Type', 'text/plain; charset=us-ascii ')
     if (upload.returncode != 0):
         handler.write("Failed!\n\n")
@@ -48,8 +44,8 @@ def bundle(handler, absolute_notebook_path):
         return
 
     resource = os.path.basename(jarfile)
-    handler.write("Success!\n\n")
-    handler.write(upload.stdout)
+    handler.write("Successfully uploaded {0} to {1}!\n\n".format(resource, DASHDBHOST))
+    SPARKAPP_LOG.info("Upload output: %s", upload.stdout)
     handler.write("\n\nTo start your spark application, you can set DASHDBPW and use the following command:\n\n"
                   "curl -k -v -u {0}:$DASHDBPW -XPOST https://{1}:8443/clues/public/jobs/submit \\\n"
                   "--header 'Content-Type:application/json;charset=UTF-8'  \\\n"
