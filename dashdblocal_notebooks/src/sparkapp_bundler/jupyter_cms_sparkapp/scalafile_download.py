@@ -8,10 +8,7 @@ from .sparkapp_bundler import *
 
 def bundle(handler, absolute_notebook_path):
     '''
-    Transforms, converts, bundles, etc. the notebook. Then issues a Tornado web 
-    response using the handler to redirect the browser, download a file, show
-    an HTML page, etc. This function must finish the handler response before
-    returning either explicitly or by raising an exception.
+    Converts the notebook into a Spark-Scala app and returns the source code
     
     :param handler: The tornado.web.RequestHandler that serviced the request
     :param absolute_notebook_path: The path of the notebook on disk
@@ -21,6 +18,5 @@ def bundle(handler, absolute_notebook_path):
     scalacode = export_to_scala(absolute_notebook_path)
 
     handler.set_header('Content-Type', 'text/plain; charset=us-ascii ')
-    for (n, line) in enumerate(scalacode.splitlines(True), 1):
-        handler.write("{0:>5}:  {1}".format(n, line))
+    handler.write(scalacode)
     handler.finish()

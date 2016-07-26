@@ -6,9 +6,6 @@
 # and target host exists
 upload-sparkapp.py /usr/local/lib/toree.jar || exit 1
 
-# change to notebooks subdir so scala projects etc in ~/work are not visible in Jupyter
-cd notebooks
-
 # call base startup script
 . /usr/local/bin/start-notebook.sh
 
