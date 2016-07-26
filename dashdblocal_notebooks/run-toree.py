@@ -3,7 +3,7 @@
 # LICENSE: Apache V2, https://opensource.org/licenses/Apache-2.0
 
 import warnings
-import _thread, sys, os, socket,time
+import _thread, sys, os, socket, time
 import signal, atexit
 import json, requests
 from requests.auth import HTTPBasicAuth
@@ -35,7 +35,7 @@ def upload_conn_info(conn_file_name, conn_file_content):
 	upload = { conn_file_name: json.dumps(conn_file_content) }
 	resp = session.post("https://{0}:8443/dashdb-api/home/tmp".format(DASHDBHOST),
 					files = upload, auth=auth, verify=False)
-	if (resp.status_code != requests.codes.ok and
+	if (resp.status_code != requests.codes.ok or
 			resp.json().get('resultCode') != 'SUCCESS'): 
 		sys.exit ("Failed to upload communication file " + conn_file_in)
 	print("Upload complete: " + resp.text)

@@ -1,6 +1,3 @@
 #!/bin/bash
-
-sbt -mem 256 update
-sbt -mem 256 compile
-sbt -mem 256 package
+sbt -mem 256 -Dsbt.log.noformat=true clean package
 
