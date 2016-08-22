@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-# (c) Copyright IBM Corporation 2016   
-# LICENSE: Apache V2, https://opensource.org/licenses/Apache-2.0
+# (c) Copyright IBM Corporation 2016
+# LICENSE: BSD-3, https://opensource.org/licenses/BSD-3-Clause
 
 # Upload Toree kernel to dashDB local via REST API
 
@@ -11,7 +11,7 @@ from requests.auth import HTTPBasicAuth
 def usage():
 	sys.exit('''
 Usage: {0} <filename>
-  Upload given Spark application file to dashDB server $DASHDBHOST, 
+  Upload given Spark application file to dashDB server $DASHDBHOST,
   authenticating with $DASHDBUSR and $DASHDBPW.
 '''.format(sys.argv[0]))
 

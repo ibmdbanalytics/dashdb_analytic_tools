@@ -1,5 +1,5 @@
 # (c) Copyright IBM Corporation 2016
-# LICENSE: Apache V2, https://opensource.org/licenses/Apache-2.0
+# LICENSE: BSD-3, https://opensource.org/licenses/BSD-3-Clause
 
 FROM jupyter/base-notebook
 # tested with jupyter/base-notebook ID 27f6af6e1dcc

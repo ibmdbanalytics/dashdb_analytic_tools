@@ -1,5 +1,5 @@
-{# (c) Copyright IBM Corporation 2016   
- # LICENSE: Apache V2, https://opensource.org/licenses/Apache-2.0 #}
+{# (c) Copyright IBM Corporation 2016
+ # LICENSE: BSD-3, https://opensource.org/licenses/BSD-3-Clause}
 
 {%- extends 'null.tpl' -%}
 
@@ -12,7 +12,7 @@ import org.apache.spark.sql._
 
 object SampleApp {
   def main(arguments: Array[String]) {
-  
+
     val sparkConf = new SparkConf().setAppName("SampleApp")
     val sc = new SparkContext(sparkConf)
     val sqlContext = SQLContext.getOrCreate(sc)
@@ -33,5 +33,5 @@ object SampleApp {
 
 {% block footer %}
   }
-} 
+}
 {% endblock footer %}

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-# (c) Copyright IBM Corporation 2016   
-# LICENSE: Apache V2, https://opensource.org/licenses/Apache-2.0
+# (c) Copyright IBM Corporation 2016
+# LICENSE: BSD-3, https://opensource.org/licenses/BSD-3-Clause
 
 import warnings
 import _thread, sys, os, socket, time
@@ -36,7 +36,7 @@ def upload_conn_info(conn_file_name, conn_file_content):
 	resp = session.post("https://{0}:8443/dashdb-api/home/tmp".format(DASHDBHOST),
 					files = upload, auth=auth, verify=False)
 	if (resp.status_code != requests.codes.ok or
-			resp.json().get('resultCode') != 'SUCCESS'): 
+			resp.json().get('resultCode') != 'SUCCESS'):
 		sys.exit ("Failed to upload communication file " + conn_file_in)
 	print("Upload complete: " + resp.text)
 
@@ -52,7 +52,7 @@ def start_kernel(toree_args):
 	resp = session.post("https://{0}:8443/clues/public/jobs/submit".format(DASHDBHOST),
 		json=req_data, auth=auth, verify=False)
 
-	if (resp.status_code != requests.codes.ok): 
+	if (resp.status_code != requests.codes.ok):
 		sys.exit ("Failed to submit Spark kernel job: " + resp.text)
 	resp_data = resp.json()
 	if (resp_data.get('status') != 'submitted'):
@@ -92,8 +92,8 @@ def stop_kernel():
 		resp = session.post("https://{0}:8443/clues/public/jobs/cancel".format(DASHDBHOST),
 			params={'jobid': jobid}, auth=auth, verify=False)
 		print(resp.text)
-		
-		
+
+
 # interrupt handler for SIGINT
 # currently, there is no mechanism to forward the interruption to the remote
 # toree kernel
@@ -112,7 +112,7 @@ def forward_ports(connection_info):
 	print("Forwarding ports " + str(ports))
 	for port in ports:
 		_thread.start_new_thread(forward_socket, (port, DASHDBHOST))
-		
+
 def forward_socket(port, target):
 	try:
 		print("waiting for local connections on {0}".format(port))
@@ -127,13 +127,13 @@ def forward_socket(port, target):
 			server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 			server_socket.connect((target, port))
 			print("forwarding {0}".format(port))
-			_thread.start_new_thread(forward_connection, (client_socket, server_socket, 
+			_thread.start_new_thread(forward_connection, (client_socket, server_socket,
 				"outgoing forward for {0}".format(port)))
 			_thread.start_new_thread(forward_connection, (server_socket, client_socket,
 				"incoming forward for {0}".format(port)))
 	finally:
 		print("forwarding for {0} ended".format(port))
- 
+
 def forward_connection(source, destination, id):
 	try:
 		while (True):

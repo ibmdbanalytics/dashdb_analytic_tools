@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-# (c) Copyright IBM Corporation 2016   
-# LICENSE: Apache V2, https://opensource.org/licenses/Apache-2.0
+# (c) Copyright IBM Corporation 2016
+# LICENSE: BSD-3, https://opensource.org/licenses/BSD-3-Clause
 
 import warnings
 import sys, os, time
@@ -10,7 +10,7 @@ from requests.auth import HTTPBasicAuth
 def usage():
 	sys.exit('''
 Usage: {0} <submit-spec>
-  Submit a Spark application eith the given specification on dashDB server $DASHDBHOST, 
+  Submit a Spark application eith the given specification on dashDB server $DASHDBHOST,
   authenticating with $DASHDBUSR and $DASHDBPW.
   Application must have been uploaded before.
 '''.format(sys.argv[0]))
@@ -43,7 +43,7 @@ def wait_for_app(jobid):
 		if (resp.json().get('status') != 'running'):
 			break
 		time.sleep(1)
-		
+
 def print_app_log(jobid, filename):
 	url = "https://{0}:8443/dashdb-api/home/spark/log/submit_{1}/{2}".format(DASHDBHOST, jobid, filename)
 	print("Retrieving logs from {0}".format(url))
@@ -60,7 +60,7 @@ def print_app_log(jobid, filename):
 	for chunk in resp.iter_content(1024):
 		sys.stdout.buffer.write(chunk)
 	return True
-				
+
 
 
 if (len(sys.argv) != 2): usage()
@@ -80,7 +80,7 @@ try:
 	print("Submitting application for user {0} on {1}".format(DASHDBUSR, DASHDBHOST))
 	(jobid, resp) = submit(submit_spec)
 	print("Submit successful: " + resp)
-	
+
 	print("Waiting for application to execute...")
 	wait_for_app(jobid)
 	print("Application has finished")
@@ -91,6 +91,6 @@ try:
 	print("\nError output of application\n")
 	if (not print_app_log(jobid, 'submit.err')):
 		print("No error output for application")
-	
+
 except requests.exceptions.ConnectionError:
 	sys.exit("Could not connect to dashDB server {0}".format(DASHDBHOST))
