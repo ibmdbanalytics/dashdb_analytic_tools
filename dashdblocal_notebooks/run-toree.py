@@ -49,7 +49,7 @@ def start_kernel(toree_args):
 		'appResource' : 'toree.jar',
 		'mainClass' : 'org.apache.toree.Main'
 	}
-	resp = session.post("https://{0}:8443/clues/public/jobs/submit".format(DASHDBHOST),
+	resp = session.post("https://{0}:8443/dashdb-api/analytics/public/apps/submit".format(DASHDBHOST),
 		json=req_data, auth=auth, verify=False)
 
 	if (resp.status_code != requests.codes.ok):
@@ -58,7 +58,7 @@ def start_kernel(toree_args):
 	if (resp_data.get('status') != 'submitted'):
 		sys.exit ("Failed to submit Spark kernel job: " + resp.text)
 
-	jobid = resp_data['jobid']
+	jobid = resp_data['submissionid']
 	print("Started Spark kernel job with id" + jobid)
 	print(resp.text)
 
@@ -70,8 +70,8 @@ def monitor_kernel():
 	while (True):
 		with warnings.catch_warnings():
 			warnings.simplefilter("ignore")
-			resp = session.get("https://{0}:8443/clues/public/monitoring/job_status".format(DASHDBHOST),
-				params={'jobid': jobid}, auth=auth, verify=False)
+			resp = session.get("https://{0}:8443/dashdb-api/analytics/public/monitoring/app_status".format(DASHDBHOST),
+				params={'submissionid': jobid}, auth=auth, verify=False)
 		if (resp.json().get('status') != 'running'):
 			print(resp.text)
 			break
@@ -89,8 +89,8 @@ def stop_kernel():
 	print("Shutting down")
 	if (jobid):
 		print("Trying to stop kernel")
-		resp = session.post("https://{0}:8443/clues/public/jobs/cancel".format(DASHDBHOST),
-			params={'jobid': jobid}, auth=auth, verify=False)
+		resp = session.post("https://{0}:8443/dashdb-api/analytics/public/apps/cancel".format(DASHDBHOST),
+			params={'submissionid': jobid}, auth=auth, verify=False)
 		print(resp.text)
 
 

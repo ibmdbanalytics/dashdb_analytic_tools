@@ -17,7 +17,7 @@ Usage: {0} <submit-spec>
 
 def submit(submit_spec):
 	headers = { "Content-Type": "application/json;charset=UTF-8" }
-	resp = session.post("https://{0}:8443/clues/public/jobs/submit".format(DASHDBHOST),
+	resp = session.post("https://{0}:8443/dashdb-api/analytics/public/apps/submit".format(DASHDBHOST),
 		data=submit_spec, headers=headers, auth=auth, verify=False)
 
 	if (resp.status_code == requests.codes.unauthorized):
@@ -36,8 +36,8 @@ def wait_for_app(jobid):
 	while (True):
 		with warnings.catch_warnings():
 			warnings.simplefilter("ignore")
-			resp = session.get("https://{0}:8443/clues/public/monitoring/job_status".format(DASHDBHOST),
-				params={'jobid': jobid}, auth=auth, verify=False)
+			resp = session.get("https://{0}:8443/dashdb-api/analytics/public/monitoring/app_status".format(DASHDBHOST),
+				params={'submissionid': jobid}, auth=auth, verify=False)
 		if (resp.status_code != requests.codes.ok):
 			sys.exit ("Failed to monitor Spark application: " + str(resp))
 		if (resp.json().get('status') != 'running'):
