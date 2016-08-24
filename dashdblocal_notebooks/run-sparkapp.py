@@ -11,7 +11,7 @@ def usage():
 	sys.exit('''
 Usage: {0} <submit-spec>
   Submit a Spark application eith the given specification on dashDB server $DASHDBHOST,
-  authenticating with $DASHDBUSR and $DASHDBPW.
+  authenticating with $DASHDBUSER and $DASHDBPASS.
   Application must have been uploaded before.
 '''.format(sys.argv[0]))
 
@@ -21,8 +21,8 @@ def submit(submit_spec):
 		data=submit_spec, headers=headers, auth=auth, verify=False)
 
 	if (resp.status_code == requests.codes.unauthorized):
-		sys.exit("Could not authenticate to {0} as user {1}. Verify DASHDBUSR and DASDBPW information"
-				.format(DASHDBHOST, DASHDBUSR))
+		sys.exit("Could not authenticate to {0} as user {1}. Verify DASHDBUSER and DASDBPW information"
+				.format(DASHDBHOST, DASHDBUSER))
 	if (resp.status_code != requests.codes.ok):
 		sys.exit ("Failed to submit Spark application: " + resp.text)
 	resp_data = resp.json()
@@ -68,16 +68,16 @@ if (len(sys.argv) != 2): usage()
 submit_spec = sys.argv[1]
 
 DASHDBHOST = os.environ.get('DASHDBHOST')
-DASHDBUSR = os.environ.get('DASHDBUSR')
-DASHDBPW = os.environ.get('DASHDBPW')
+DASHDBUSER = os.environ.get('DASHDBUSER')
+DASHDBPASS = os.environ.get('DASHDBPASS')
 if(not DASHDBHOST): DASHDBHOST='localhost'; print("Using default localhost for DASHDBHOST")
-if (not DASHDBUSR or not DASHDBPW): sys.exit("DASHDBUSR and DASHDBPW variables must be defined")
+if (not DASHDBUSER or not DASHDBPASS): sys.exit("DASHDBUSER and DASHDBPASS variables must be defined")
 
 session = requests.Session()
-auth = HTTPBasicAuth(DASHDBUSR, DASHDBPW)
+auth = HTTPBasicAuth(DASHDBUSER, DASHDBPASS)
 
 try:
-	print("Submitting application for user {0} on {1}".format(DASHDBUSR, DASHDBHOST))
+	print("Submitting application for user {0} on {1}".format(DASHDBUSER, DASHDBHOST))
 	(jobid, resp) = submit(submit_spec)
 	print("Submit successful: " + resp)
 

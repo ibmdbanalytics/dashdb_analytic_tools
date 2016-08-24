@@ -39,20 +39,28 @@ Follow these steps to get your own Docker container instance:
 4. Start a notebook container, specifying the user name and the password of a user that you have created
  inside the dashDB installation (e.g. bluadmin)
 
-  `docker run -it --rm --net=host -e DASHDBUSR=<user> -e DASHDBPW=<password> <image name>`
+  `docker run -it --rm --net=host -e DASHDBUSER=<user> -e DASHDBPASS=<password> <image name>`
 
  Note that the dashDB local container as well as the notebook container use `--net=host` so they share
  the same network devices (fortunately, there are no port conflicts). In particular, the Jupyter server "sees" the
  kernel's communication ports on localhost
 
-6. Open the Jupyter start page http://<hostname>:8888 in your browser. In the upper right of the start page,
- click "New" -> "IDAX - Scala" to open a new notebook. Watch the output of the notebook container while the
- notebook kernel launches a toree server inside dashDB. Note that it can take more than a minute before the
+6. Open the Jupyter start page http://<hostname>:8888 in your browser.
+
+ If the message from `docker run` above indicates that the Jupyter server is started and listening on
+ port 8888, but you cannot connect, then this may be caused by a firewall setup on your docker host. Since
+ we're running with --net=host, docker will not create iptables rules automatically to ACCEPT connections
+ on that port and you may need to configure that manually according to your docker host OS, e.g. with
+
+  `iptables -A INPUT -p tcp --dport 8888 -j ACCEPT`
+
+ When you see the Jupyter start page, open the Spark_KMeansSample.ipynb notebook.
+ Watch the output of the notebook container while the
+ notebook kernel launches a Toree server inside dashDB. Note that it can take more than a minute before the
  kernel is fully started and responsive.
 
-7. You can now enter `println(sc.getConf.toDebugString)` in a notebook cell to verify your settings (e.g. the
- active class path) and `java.sql.DriverManager.getConnection("jdbc:db2:BLUDB")` to check that you can connect
- to the dashDB database.
+7. Run the sample notebook to verify that you can access the dashDB database and perform Spark
+analytics modeling.
 
 To shut down the notebook server and the container, press Ctrl-C from the console
 or use `docker stop <container>` from a different terminal
@@ -61,8 +69,8 @@ arguments with `-d`
 
 ## Monitoring
 
-In the dashDB local web console you can find under Monitor->Workloads a tab for Spark. From there you can launch
-the Apache Spark monitoring web UI. The Toree Spark kernel used by the Notebook can be accessed there to be monitored
+In the dashDB local web console you can find a tab for Spark under Monitor->Workloads. From there, you can launch
+the Apache Spark monitoring web UI. The Toree Spark kernel used by the Notebook can be monitored
 with the application name "IBM Spark Kernel".
 
 # Using Spark in notebooks
@@ -88,9 +96,9 @@ point to extend the Spark application in a local Scala/SBT development environme
 includes two additional command line scripts:
 
 * upload-<appname>.sh  uploads the packaged application to dashDB local
-* run-<appname>.sh  launches the applcation in the dashDB local Spark environment
+* run-<appname>.sh  launches the application in the dashDB local Spark environment
 
-Both scripts require that you have the `DASHDBUSR` and `DASHDBPW` environment variables set and specify the target
+Both scripts require that you have the `DASHDBUSER` and `DASHDBPASS` environment variables set and specify the target
 dashDB installation with the `DASHDBHOST` environment variable
 
 
@@ -107,7 +115,7 @@ If you want to explicitly set the notebook port when running multiple containers
 `--port` argument and the container launch script. Launch script arguments are passed through to the
 Jupyter notebook command, see https://jupyter-notebook.readthedocs.io/en/latest/config.html for possible options.
 
-  `docker run -it --rm --net=host -e DASHDBUSR=<user> -e DASHDBPW=<password> <image name> launch-with-idax.sh --port=9999`
+  `docker run -it --rm --net=host -e DASHDBUSER=<user> -e DASHDBPASS=<password> <image name> launch-with-idax.sh --port=9999`
 
 ## Storing notebooks outside the container ##
 
@@ -132,7 +140,7 @@ the recommended place for keeping the files is the user's home directory:
 
 3. Now add the following arguments when running the notebook container
 
-  `docker run -v /mnt/clusterfs/home/bluuser1/notebooks:/home/jovyan/work -e NB_UID=5003 --user=root -e DASHDBUSR=bluuser1 -e DASHDBPW=blupass1 -it --rm --net=host <image name>`
+  `docker run -v /mnt/clusterfs/home/bluuser1/notebooks:/home/jovyan/work -e NB_UID=5003 --user=root -e DASHDBUSER=bluuser1 -e DASHDBPASS=blupass1 -it --rm --net=host <image name>`
 
   Notebooks are now stored in /mnt/clusterfs/home/bluuser1/notebooks, which corresponds to the home folder
   of user bluuser1 in the dasdDB container. The directory is created if it does not exist.
@@ -143,7 +151,7 @@ The notebook container also includes basic support for remote kernels by forward
 communication ports. So instead of running it on the same docker host that hosts the dashDB container,
 you can run it on any machine.
 
-  `docker run -it --rm -p 8888:8888 -e DASHDBHOST=<dashDB-hostname> -e DASHDBUSR=<user> -e DASHDBPW=<password> <image name>`
+  `docker run -it --rm -p 8888:8888 -e DASHDBHOST=<dashDB-hostname> -e DASHDBUSER=<user> -e DASHDBPASS=<password> <image name>`
 
 Note the missing --net=host and and the DASHDBHOST env variable.
 

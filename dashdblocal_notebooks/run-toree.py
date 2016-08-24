@@ -17,10 +17,10 @@ conn_file_in = sys.argv[1]
 extra_args = sys.argv[2:]
 
 DASHDBHOST = os.environ.get('DASHDBHOST')
-DASHDBUSR = os.environ.get('DASHDBUSR')
-DASHDBPW = os.environ.get('DASHDBPW')
+DASHDBUSER = os.environ.get('DASHDBUSER')
+DASHDBPASS = os.environ.get('DASHDBPASS')
 if(not DASHDBHOST): DASHDBHOST='localhost'
-if (not DASHDBUSR or not DASHDBPW): sys.exit("DASHDBUSR and DASHDBPW variables must be defined")
+if (not DASHDBUSER or not DASHDBPASS): sys.exit("DASHDBUSER and DASHDBPASS variables must be defined")
 IS_REMOTE_KERNEL = (DASHDBHOST != "localhost" and DASHDBHOST != "127.0.0.1")
 
 jobid = None
@@ -147,10 +147,10 @@ def forward_connection(source, destination, id):
 
 
 conn_file_name = os.path.basename(conn_file_in)
-conn_file_out = "/mnt/blumeta0/home/{0}/tmp/{1}".format(DASHDBUSR, conn_file_name)
+conn_file_out = "/mnt/blumeta0/home/{0}/tmp/{1}".format(DASHDBUSER, conn_file_name)
 
 session = requests.Session()
-auth = HTTPBasicAuth(DASHDBUSR, DASHDBPW)
+auth = HTTPBasicAuth(DASHDBUSER, DASHDBPASS)
 
 # handle kernel interrupting explicitly
 signal.signal(signal.SIGINT, interrupted)

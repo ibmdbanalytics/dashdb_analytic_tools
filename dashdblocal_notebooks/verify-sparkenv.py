@@ -2,38 +2,31 @@
 # (c) Copyright IBM Corporation 2016
 # LICENSE: BSD-3, https://opensource.org/licenses/BSD-3-Clause
 
-# Upload Toree kernel to dashDB local via REST API
+# Use the dashDB analytics REST API to check that the dashDB Spark support
+# is configured and accessible
 
 import sys, os
 import json, requests
 from requests.auth import HTTPBasicAuth
 
-def usage():
-	sys.exit('''
-Usage: {0} <filename>
-  Upload given Spark application file to dashDB server $DASHDBHOST,
-  authenticating with $DASHDBUSER and $DASHDBPASS.
-'''.format(sys.argv[0]))
-
-def upload(upload_file):
+def verify_sparkenv():
 	auth = HTTPBasicAuth(DASHDBUSER, DASHDBPASS)
-	upload = {'file1': open(upload_file, 'rb') }
-	resp = requests.post("https://{0}:8443/dashdb-api/home/spark/apps".format(DASHDBHOST),
-		files = upload, auth=auth, verify=False)
+	resp = requests.get("https://{0}:8443/dashdb-api/analytics/public/configuration/version".format(DASHDBHOST),
+		auth=auth, verify=False)
 	if (resp.status_code == requests.codes.unauthorized):
 		sys.exit("Could not authenticate to {0} as user {1}. Verify DASHDBUSER and DASHDBPASS information"
 				.format(DASHDBHOST, DASHDBUSER))
+	if (resp.status_code == requests.codes.not_found):
+		# try accessing the old API endpoint
+		resp2 = requests.get("https://{0}:8443/clues/public/configuration/version".format(DASHDBHOST),
+						auth=auth, verify=False)
+		if (resp2.status_code == requests.codes.ok):
+			sys.exit("The dashDB version running on {0} is not compatible with this notebook. "
+					 "Upgrade your dashDB local docker images in order to use this notebook"
+					 .format(DASHDBHOST))
 	if (resp.status_code != requests.codes.ok):
-		sys.exit("Failed to upload {0}: {1}".format(upload_file, resp))
-	if (resp.json().get('resultCode') != 'SUCCESS'):
-		sys.exit("Failed to upload {0}: {1}".format(upload_file, resp.txt))
-	return resp.text
+		sys.exit("Error accessing dashDB analytics REST API on {0}: {1}".format(DASHDBHOST, resp))
 
-
-
-if (len(sys.argv) != 2): usage()
-
-upload_file = sys.argv[1]
 
 DASHDBHOST = os.environ.get('DASHDBHOST')
 DASHDBUSER = os.environ.get('DASHDBUSER')
@@ -42,8 +35,8 @@ if(not DASHDBHOST): DASHDBHOST='localhost'; print("Using default localhost for D
 if (not DASHDBUSER or not DASHDBPASS): sys.exit("DASHDBUSER and DASHDBPASS variables must be defined")
 
 try:
-	print("Uploading {0} to {1} apps directory on {2}".format(upload_file, DASHDBUSER, DASHDBHOST))
-	resp = upload(upload_file)
-	print("Upload complete: " + resp)
+	print("Verifying Spark environment on {0}".format(DASHDBHOST))
+	verify_sparkenv();
+	print("Success.")
 except requests.exceptions.ConnectionError:
 	sys.exit("Could not connect to dashDB server {0}".format(DASHDBHOST))

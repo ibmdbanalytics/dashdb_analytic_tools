@@ -13,7 +13,7 @@ APPDIR = HOME + '/projects/sparkapp'
 SOURCEFILE = APPDIR + '/src/main/scala/notebook.scala'
 
 DASHDBHOST = os.environ.get('DASHDBHOST')
-DASHDBUSR = os.environ.get('DASHDBUSR')
+DASHDBUSER = os.environ.get('DASHDBUSER')
 
 
 @gen.coroutine
@@ -46,10 +46,10 @@ def bundle(handler, absolute_notebook_path):
     resource = os.path.basename(jarfile)
     handler.write("Successfully uploaded {0} to {1}!\n\n".format(resource, DASHDBHOST))
     SPARKAPP_LOG.info("Upload output: %s", upload.stdout)
-    handler.write("\n\nTo start your spark application, you can set DASHDBPW and use the following command:\n\n"
-                  "curl -k -v -u {0}:$DASHDBPW -XPOST https://{1}:8443/dashdb-api/analytics/public/apps/submit \\\n"
+    handler.write("\n\nTo start your spark application, you can set DASHDBPASS and use the following command:\n\n"
+                  "curl -k -v -u {0}:$DASHDBPASS -XPOST https://{1}:8443/dashdb-api/analytics/public/apps/submit \\\n"
                   "--header 'Content-Type:application/json;charset=UTF-8'  \\\n"
                   "--data '{{ \"appResource\" : \"{2}\", \"mainClass\" : \"SampleApp\" }}'\n"
-                  .format(DASHDBUSR, DASHDBHOST, resource))
+                  .format(DASHDBUSER, DASHDBHOST, resource))
     handler.finish()
 
