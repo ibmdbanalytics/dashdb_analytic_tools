@@ -23,7 +23,7 @@ if(not DASHDBHOST): DASHDBHOST='localhost'
 if (not DASHDBUSER or not DASHDBPASS): sys.exit("DASHDBUSER and DASHDBPASS variables must be defined")
 IS_REMOTE_KERNEL = (DASHDBHOST != "localhost" and DASHDBHOST != "127.0.0.1")
 
-jobid = None
+submissionid = None
 
 
 # upload connection JSON file to dashDB local
@@ -43,7 +43,7 @@ def upload_conn_info(conn_file_name, conn_file_content):
 
 # start toree server on dashDB local
 def start_kernel(toree_args):
-	global jobid
+	global submissionid
 	req_data = {
 		'appArgs' : toree_args,
 		'appResource' : 'toree.jar',
@@ -58,20 +58,20 @@ def start_kernel(toree_args):
 	if (resp_data.get('status') != 'submitted'):
 		sys.exit ("Failed to submit Spark kernel job: " + resp.text)
 
-	jobid = resp_data['submissionid']
-	print("Started Spark kernel job with id" + jobid)
+	submissionid = resp_data['submissionid']
+	print("Started Spark kernel with submission id " + submissionid)
 	print(resp.text)
 
 
 # poll toree server status and wait for termination
 def monitor_kernel():
-	global jobid
+	global submissionid
 	i = 0
 	while (True):
 		with warnings.catch_warnings():
 			warnings.simplefilter("ignore")
 			resp = session.get("https://{0}:8443/dashdb-api/analytics/public/monitoring/app_status".format(DASHDBHOST),
-				params={'submissionid': jobid}, auth=auth, verify=False)
+				params={'submissionid': submissionid}, auth=auth, verify=False)
 		if (resp.json().get('status') != 'running'):
 			print(resp.text)
 			break
@@ -80,17 +80,17 @@ def monitor_kernel():
 			i = 60
 		i -= 1
 		time.sleep(1) # sleep a second
-	jobid = None
+	submissionid = None
 
 
 # explicitly request to shut down the toree server
 def stop_kernel():
-	global jobid
+	global submissionid
 	print("Shutting down")
-	if (jobid):
+	if (submissionid):
 		print("Trying to stop kernel")
 		resp = session.post("https://{0}:8443/dashdb-api/analytics/public/apps/cancel".format(DASHDBHOST),
-			params={'submissionid': jobid}, auth=auth, verify=False)
+			params={'submissionid': submissionid}, auth=auth, verify=False)
 		print(resp.text)
 
 

@@ -55,9 +55,9 @@ Follow these steps to get your own Docker container instance:
   `iptables -A INPUT -p tcp --dport 8888 -j ACCEPT`
 
  When you see the Jupyter start page, open the Spark_KMeansSample.ipynb notebook.
- Watch the output of the notebook container while the
- notebook kernel launches a Toree server inside dashDB. Note that it can take more than a minute before the
- kernel is fully started and responsive.
+ Watch the output of the notebook container while the notebook kernel launches a Toree server inside dashDB
+ and the browser title for the notebook still displays "(Starting) <notebook name>".
+ Note that it can take more than a minute before the kernel is fully started and responsive.
 
 7. Run the sample notebook to verify that you can access the dashDB database and perform Spark
 analytics modeling.
@@ -72,6 +72,12 @@ arguments with `-d`
 In the dashDB local web console you can find a tab for Spark under Monitor->Workloads. From there, you can launch
 the Apache Spark monitoring web UI. The Toree Spark kernel used by the Notebook can be monitored
 with the application name "IBM Spark Kernel".
+
+To see the output of the Spark kernel, first note its submission ID from the docker logs:
+  `docker logs <notebook-container-name> | grep "Started Spark kernel"`
+Then download the logs using the dashDB REST API with
+  `curl -k -v -u <user>:<password> https://<host>:8443/dashdb-api/home/spark/log/submission_<ID>/submission.out`
+
 
 # Using Spark in notebooks
 
@@ -91,15 +97,16 @@ The first option will compile your notebook into a stand-alone Spark application
 to the spark/apps directory of the dashDB local user. You can then use the dashDB local REST API to launch the
 application.
 
-The second option will download a complete SBT project generated from your application. You can use this as a starting
+The second option will download a complete SBT project generated from your application to your local system.
+You can use this as a starting
 point to extend the Spark application in a local Scala/SBT development environment. The project is pre-compiled and
 includes two additional command line scripts:
 
-* upload-<appname>.sh  uploads the packaged application to dashDB local
-* run-<appname>.sh  launches the application in the dashDB local Spark environment
+* upload_<appname>.sh  uploads the packaged application to dashDB local
+* submit_<appname>.sh  launches the application in the dashDB local Spark environment
 
-Both scripts require that you have the `DASHDBUSER` and `DASHDBPASS` environment variables set and specify the target
-dashDB installation with the `DASHDBHOST` environment variable
+Before you run the scripts, edit the settings.sh script that provides the environment variables to
+connect to dashDB local from your local system
 
 
 # Additional configuration options
@@ -140,9 +147,9 @@ the recommended place for keeping the files is the user's home directory:
 
 3. Now add the following arguments when running the notebook container
 
-  `docker run -v /mnt/clusterfs/home/bluuser1/notebooks:/home/jovyan/work -e NB_UID=5003 --user=root -e DASHDBUSER=bluuser1 -e DASHDBPASS=blupass1 -it --rm --net=host <image name>`
+  `docker run -v /mnt/clusterfs/home/bluuser1/work:/home/jovyan/work -e NB_UID=5003 --user=root -e DASHDBUSER=bluuser1 -e DASHDBPASS=blupass1 -it --rm --net=host <image name>`
 
-  Notebooks are now stored in /mnt/clusterfs/home/bluuser1/notebooks, which corresponds to the home folder
+  Notebooks are now stored in /mnt/clusterfs/home/bluuser1/work, which is inside the home folder
   of user bluuser1 in the dasdDB container. The directory is created if it does not exist.
 
 ## Remote kernel ##

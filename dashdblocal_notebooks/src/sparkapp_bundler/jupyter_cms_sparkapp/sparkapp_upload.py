@@ -27,16 +27,18 @@ def bundle(handler, absolute_notebook_path):
     '''
 
     #TEMPORARY hardcode path for development
-    #absolute_notebook_path = '/home/jovyan/work/notebooks/Spark_KMeansSample.ipynb'
+    #absolute_notebook_path = '/home/jovyan/work/Spark_KMeansSample.ipynb'
     notebook_filename = os.path.splitext(os.path.basename(absolute_notebook_path))[0]
 
+    handler.set_header('Content-Type', 'text/plain; charset=us-ascii ')
+    handler.write("Building scala application...\n")
+    handler.flush()
     export_to_scalafile(absolute_notebook_path, SOURCEFILE)
     jarfile = build_scala_project(handler, APPDIR, SOURCEFILE, notebook_filename)
     if not jarfile: return
 
     upload = subprocess.run(["upload-sparkapp.py", jarfile],
                             stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    handler.set_header('Content-Type', 'text/plain; charset=us-ascii ')
     if (upload.returncode != 0):
         handler.write("Failed!\n\n")
         handler.write(upload.stdout)
