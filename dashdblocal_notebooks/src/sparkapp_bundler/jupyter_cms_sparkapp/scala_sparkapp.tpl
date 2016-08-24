@@ -1,5 +1,6 @@
 {# (c) Copyright IBM Corporation 2016
- # LICENSE: BSD-3, https://opensource.org/licenses/BSD-3-Clause}
+ # LICENSE: BSD-3, https://opensource.org/licenses/BSD-3-Clause
+ #}
 
 {%- extends 'null.tpl' -%}
 
