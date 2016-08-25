@@ -1,3 +1,6 @@
+# (c) Copyright IBM Corporation 2015
+# LICENSE: GPL-2.0, https://opensource.org/licenses/GPL-2.0
+
 ## Start with the official rocker image providing 'base R'
 FROM rocker/rstudio:latest
 ## This handle reaches Torsten
