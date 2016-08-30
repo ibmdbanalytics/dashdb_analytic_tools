@@ -1,6 +1,6 @@
 # Building and deploying a Jupyter notebook container for dashDB local
 
-## Overview ##
+## Overview
 
 This project generates a Docker image that is based on the
 [jupyter/base-notebook](https://github.com/jupyter/docker-stacks/tree/master/base-notebook) image,
@@ -17,7 +17,7 @@ and there are no versioning issues between Spark components running in different
 
 Using this container requires a dashDB local installation where the integrated Spark support has been enabled.
 
-## Getting started ##
+## Getting started
 
 Follow these steps to get your own Docker container instance:
 
@@ -111,7 +111,7 @@ connect to dashDB local from your local system
 
 # Additional configuration options
 
-## Running multiple containers ##
+## Running multiple containers
 
 Jupyter notebook server is a single-user application, but you can run multiple notebook containers for
 different users. The default notebook port is 8888, Jupyter notebook will retry with incrementing port
@@ -124,7 +124,7 @@ Jupyter notebook command, see https://jupyter-notebook.readthedocs.io/en/latest/
 
   `docker run -it --rm --net=host -e DASHDBUSER=<user> -e DASHDBPASS=<password> <image name> launch-with-idax.sh --port=9999`
 
-## Storing notebooks outside the container ##
+## Storing notebooks outside the container
 
 The default configuration of the notebook container will store notebook files within the container.
 This means that the files are removed along with your container. You can keep the files on a mounted volume
@@ -152,7 +152,7 @@ the recommended place for keeping the files is the user's home directory:
   Notebooks are now stored in /mnt/clusterfs/home/bluuser1/work, which is inside the home folder
   of user bluuser1 in the dasdDB container. The directory is created if it does not exist.
 
-## Remote kernel ##
+## Remote kernel
 
 The notebook container also includes basic support for remote kernels by forwarding the Jupyter notebook
 communication ports. So instead of running it on the same docker host that hosts the dashDB container,
@@ -166,7 +166,16 @@ The port forwarding mechanism is quite basic and has shown to be unstable under 
 Running the notebook container on the same docker host with `--net=host` is currently the preferred approach.
 
 
-## Limitations ##
+# Limitations
+
+## No support for IPython specific syntax
+
+Currently, Spark/Python support for notebooks is built on Toree, which handles the Jupyter kernel protocol
+and them invokes the Python interpreter directly. This implies, that Spark/Python notebooks are *not*
+built on IPython, and, by consequence, [IPython syntax extensions](http://ipython.readthedocs.io/en/stable/interactive/python-ipython-diff.html)
+are not available in Spark/Python notebooks.
+
+## Kernel interrupt
 
 Currently, we have no way to forward an interrupt signal to the Toree kernel which runs in a different container
 without a terminal. Therefore Kernel interrupting is not supported and has no effect.
