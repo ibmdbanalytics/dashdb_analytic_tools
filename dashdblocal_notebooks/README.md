@@ -11,9 +11,10 @@ by dashDB local, using the [Apache Toree](https://toree.incubator.apache.org/) k
 
 Unlike the Spark notebooks in
 [jupyter/docker-stacks](https://github.com/jupyter/docker-stacks), there is no Apache Spark installation
-in the notebook container, Spark driver and executor processes run in the dashDB local
+in the notebook container, all Spark driver and executor processes run in the dashDB local
 Spark environment. The Spark applications can access dashDB data easily and efficiently
-and there are no versioning issues between Spark components running in different containers.
+and you do not need to maintain version compatibility between Spark installations in
+multiple containers.
 
 Using this container requires a dashDB local installation where the integrated Spark support has been enabled.
 
@@ -23,29 +24,39 @@ Follow these steps to get your own Docker container instance:
 
 1. Log in to a host machine that hosts a dashDB local SMP installation or to the head node of a MPP installation.
 
-1. Install a Git client in your path.
+2. Install a Git client in your path, see https://git-scm.com/downloads. You can perfom this and
+ the following clone step as either the root user or a normal system user. When working as root user,
+ run an `umask 0022` before cloning the repository, to avoid stripping file permissions from the
+ local repository files.
 
-2. Issue this command to clone the repository into a new directory:
+2. Issue the following command to clone the repository into a new directory:
 
   `git clone https://github.com/ibmdbanalytics/dashdb_analytic_tools.git`
 
  This creates a new directory **dashdb_analytic_tools** with subdirectory dashdblocal_notebooks.
- Change to the dashdblocal_notebooks subdirectory.
 
-3. As a user with root authority, build the image:
+3. As root user, build the image:
 
-  `docker build -t <image name> <path to your dashdblocal_notebooks directory>`
+  `docker build -t dashdblocal_notebook <path to your dashdblocal_notebooks directory>`
 
-4. Start a notebook container, specifying the user name and the password of a user that you have created
+4. As root user, start a notebook container, specifying the user name and the password of a user that you have created
  inside the dashDB installation (e.g. bluadmin)
 
-  `docker run -it --rm --net=host -e DASHDBUSER=<user> -e DASHDBPASS=<password> <image name>`
+  `docker run -it --rm --net=host -e DASHDBUSER=<user> -e DASHDBPASS=<password> dashdblocal_notebook`
+
+ It is recommended to start the container as a foreground process for the first time. If you have verified that the
+ container works and want to run it as a background service, replace the `-i --rm`  arguments with `-d` and give it
+ a name for easier referencing:
+
+  `docker run -it --rm --net=host -e DASHDBUSER=<user> -e DASHDBPASS=<password> --name <user>_notebook dashdblocal_notebook`
+
 
  Note that the dashDB local container as well as the notebook container use `--net=host` so they share
  the same network devices (fortunately, there are no port conflicts). In particular, the Jupyter server "sees" the
  kernel's communication ports on localhost
 
-6. Open the Jupyter start page http://<hostname>:8888 in your browser.
+6. Open the Jupyter start page `http://<hostname>:8888` in a browser, where <hostname> is the external hostname or IP of
+ the docker host and the dashDB system running on it. This can be done as any user from any system
 
  If the message from `docker run` above indicates that the Jupyter server is started and listening on
  port 8888, but you cannot connect, then this may be caused by a firewall setup on your docker host. Since
@@ -62,12 +73,24 @@ Follow these steps to get your own Docker container instance:
 7. Run the sample notebook to verify that you can access the dashDB database and perform Spark
 analytics modeling.
 
-To shut down the notebook server and the container, press Ctrl-C from the console
-or use `docker stop <container>` from a different terminal
-If you have verified that the container works and want to run it as a background service, replace the `-i --rm`
-arguments with `-d`
+## Shutting down
+
+To shut down the notebook server and the container, press Ctrl-C from the console and confirm with 'y'
+when running the container as a foreground process.
+For containers running as a daemon process, use `docker stop <container-name>`.
+Stopped containers can be re-started; use the `docker rm` command to dispose them.
+Use `docker ps -a` to find the names of all containers, including stopped ones.
+See the [https://docs.docker.com](docker documentation) for more information on managing containers.
+
+Note: Running `docker kill` or `docker rm -f` while notebooks are still open
+will terminate the container without giving it a chance to stop the associated Spark kernels running in dashDB.
+This will lead to stale spark applications that consume resources in dashDB. Use the monitoring facilities of
+dashDB (see below) to locate and kill stale "IBM Spark Kernel" applications.
+
 
 ## Monitoring
+
+Use `docker logs <container-name>` to see the Jupyter log output for a background container.
 
 In the dashDB local web console you can find a tab for Spark under Monitor->Workloads. From there, you can launch
 the Apache Spark monitoring web UI. The Toree Spark kernel used by the Notebook can be monitored
@@ -118,11 +141,12 @@ different users. The default notebook port is 8888, Jupyter notebook will retry 
 numbers if you start more than one notebook container on the same server, so the next notebook container
 will connect at 8889 etc.
 
-If you want to explicitly set the notebook port when running multiple containers with `--net=host`, append the
-`--port` argument and the container launch script. Launch script arguments are passed through to the
+If you want to explicitly set the notebook port when running multiple containers with `--net=host`,
+append the the container launch script `launch-with-idax.sh`
+and the `--port` argument and. Launch script arguments are passed through to the
 Jupyter notebook command, see https://jupyter-notebook.readthedocs.io/en/latest/config.html for possible options.
 
-  `docker run -it --rm --net=host -e DASHDBUSER=<user> -e DASHDBPASS=<password> <image name> launch-with-idax.sh --port=9999`
+  `docker run -it --rm --net=host -e DASHDBUSER=<user> -e DASHDBPASS=<password> dashdblocal_notebook launch-with-idax.sh --port=9999`
 
 ## Storing notebooks outside the container
 
@@ -147,7 +171,7 @@ the recommended place for keeping the files is the user's home directory:
 
 3. Now add the following arguments when running the notebook container
 
-  `docker run -v /mnt/clusterfs/home/bluuser1/work:/home/jovyan/work -e NB_UID=5003 --user=root -e DASHDBUSER=bluuser1 -e DASHDBPASS=blupass1 -it --rm --net=host <image name>`
+  `docker run -v /mnt/clusterfs/home/bluuser1/work:/home/jovyan/work -e NB_UID=5003 --user=root -e DASHDBUSER=bluuser1 -e DASHDBPASS=blupass1 -it --rm --net=host dashdblocal_notebook`
 
   Notebooks are now stored in /mnt/clusterfs/home/bluuser1/work, which is inside the home folder
   of user bluuser1 in the dasdDB container. The directory is created if it does not exist.
@@ -158,7 +182,7 @@ The notebook container also includes basic support for remote kernels by forward
 communication ports. So instead of running it on the same docker host that hosts the dashDB container,
 you can run it on any machine.
 
-  `docker run -it --rm -p 8888:8888 -e DASHDBHOST=<dashDB-hostname> -e DASHDBUSER=<user> -e DASHDBPASS=<password> <image name>`
+  `docker run -it --rm -p 8888:8888 -e DASHDBHOST=<dashDB-hostname> -e DASHDBUSER=<user> -e DASHDBPASS=<password> dashdblocal_notebook`
 
 Note the missing --net=host and and the DASHDBHOST env variable.
 
@@ -167,6 +191,12 @@ Running the notebook container on the same docker host with `--net=host` is curr
 
 
 # Limitations
+
+## No authentication
+
+Currently, the notebook server does not require any form of authentication. If you know the correct hostname and port,
+you can connect to the notebook server and therefore submit arbitrary code to the dashDB Spark engine under the user
+ID that was specified when starting the container.
 
 ## No support for IPython specific syntax
 

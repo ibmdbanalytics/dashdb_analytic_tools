@@ -8,13 +8,18 @@ This project generates a Docker image that is based on the [rocker/rstudio](http
 
 Follow these steps to get your own Docker container instance:
 
-1. Install a Git client in your path.
+12. Install a Git client in your path, see [https://git-scm.com/downloads]. You can perfom this and
+ the following clone step as either the root user or a normal system user. When working as root user,
+ run an `umask 0022` before cloning the repository, to avoid stripping file permissions from the
+ local repository files.
 
 2. Issue this command to clone the repository into a new directory:
-   
+
   `git clone https://github.com/ibmdbanalytics/dashdb_analytic_tools.git`
- 
- This creates a new directory **dashdb_analytic_tools** with subdirectory dashdb_rstudio. Change to the dashdb_rstudio subdirectory.
+
+ This creates a new directory **dashdb_analytic_tools** with subdirectory dashdb_rstudio.
+ Change to the dashdb_rstudio subdirectory.
+
 3. Download the dashDB driver package **ibm_data_server_driver_package_linuxx64_v10.5.tar.gz** into the same dashdb_rstudio directory from either of the following sources:
   * From the dashDB web console:
     1. Log in with your dashDB credentials.
@@ -24,7 +29,7 @@ Follow these steps to get your own Docker container instance:
     2. Log in with your IBM ID (sign-up is free).
     3. Select the offering **IBM Data Server Driver Package (Linux AMD64 and Intel EM64T)** for the Linux platform.
   * Make sure the downloaded file is really named **ibm_data_server_driver_package_linuxx64_v10.5.tar.gz**. Rename it if this is not the case before you continue with the build process. Be aware that *.gz files will be automatically extracted on some operation systems (OS X), however it is necessary to use the gzipped compressed package.
-  
+
 4. As a user with root authority, build the image:
   * If you want to build the image and run the container in your own Linux environment, issue these commands:
     - `docker build -t <image name> <path to your dashdb_rstudio directory>`
@@ -42,7 +47,7 @@ Follow these steps to get your own Docker container instance:
     The last of these commands returns the IP address of the RStudio container in Bluemix. Click [here] (https://www.ng.bluemix.net/docs/containers/container_cli_reference_cfic.html) for more information about Bluemix containers.
 
 5. To launch the RStudio web UI:
-  * On a Linux system, point your browser to `<ip_addr>:8787`, where `<ip_addr>` represents the IP address of the Linux system that hosts the RStudio container.  
+  * On a Linux system, point your browser to `<ip_addr>:8787`, where `<ip_addr>` represents the IP address of the Linux system that hosts the RStudio container.
   * On a Windows or Mac system, use the [Docker Toolbox] (https://www.docker.com/products/docker-toolbox) to create a Docker environment on you computer in which you can run Docker commands and containers.
 6. Log in to RStudio. The default user and password are both **rstudio**. For security, change the password immediately after you log in for the first time.
 
@@ -52,16 +57,16 @@ The docker file you build in step #4 creates a "samples" directory in your home 
 
 Most samples upload their own data, however some expect the following tables to be present. This should be the case for dashDB aaS, but might not be true on other systems. If the data is not present, you need to upload it before running the samples using the following steps:
 
-1. Download the following three CSV files: 
+1. Download the following three CSV files:
    * [SHOWCASE_SYSTYPES.csv] (./SHOWCASE_SYSTYPES.csv)
    * [SHOWCASE_SYSUSAGE.csv] (./SHOWCASE_SYSUSAGE.csv)
    * [SHOWCASE_SYSTEMS.csv] (./SHOWCASE_SYSTEMS.csv)
 2. Load the contents of these CSV files into the following tables in your database:
-   * SHOWCASE_SYSTYPES 
-   * SHOWCASE_SYSUSAGE 
+   * SHOWCASE_SYSTYPES
+   * SHOWCASE_SYSUSAGE
    * SHOWCASE_SYSTEMS
 
-If you choose different table names, modify the script to reflect these different names. 
+If you choose different table names, modify the script to reflect these different names.
 
 ## Status ##
 
@@ -69,7 +74,7 @@ This is work in progress. For any request please contact torsten@de.ibm.com.
 
 ## License ##
 
-The docker file above and the content of the samples directory are provided under the GPL v2 or later. 
+The docker file above and the content of the samples directory are provided under the GPL v2 or later.
 
 ## Base Docker containers ##
 
