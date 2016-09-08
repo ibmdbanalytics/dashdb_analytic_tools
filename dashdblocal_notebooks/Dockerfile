@@ -58,14 +58,14 @@ ENV PROJECTS_DIR /home/$NB_USER/projects
 COPY build.sbt.template build.sh $PROJECTS_DIR/
 COPY kernel-scala.json /home/$NB_USER/.local/share/jupyter/kernels/idax-scala/kernel.json
 COPY kernel-python.json /home/$NB_USER/.local/share/jupyter/kernels/idax-python/kernel.json
-COPY verify-sparkenv.py upload-sparkapp.py run-toree.py launch-with-idax.sh /usr/local/bin/
+COPY verify-sparkenv.py upload-sparkapp.py patch-ui.py run-toree.py launch-with-idax.sh /usr/local/bin/
 COPY Spark_KMeansSample.ipynb ./
 
 # copy jupyter CMS extensions
 ADD src /src
 
 # fix permissions if git repo was checked out as root
-RUN chmod -R a+rx /src
+RUN chmod -R a+rX /src
 RUN chmod a+rx /usr/local/bin/*
 # fix ownership for all files copied into homedir
 RUN chown -R $NB_USER /home/$NB_USER

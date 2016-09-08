@@ -56,7 +56,7 @@ Follow these steps to get your own Docker container instance:
  kernel's communication ports on localhost
 
 6. Open the Jupyter start page `http://<hostname>:8888` in a browser, where <hostname> is the external hostname or IP of
- the docker host and the dashDB system running on it. This can be done as any user from any system
+ the docker host and the dashDB system running on it. This can be done as any user from any system.
 
  If the message from `docker run` above indicates that the Jupyter server is started and listening on
  port 8888, but you cannot connect, then this may be caused by a firewall setup on your docker host. Since
@@ -65,7 +65,8 @@ Follow these steps to get your own Docker container instance:
 
   `iptables -A INPUT -p tcp --dport 8888 -j ACCEPT`
 
- When you see the Jupyter start page, open the Spark_KMeansSample.ipynb notebook.
+ When you see the Jupyter start page, log in using the password for the dashDB user (the one you specified
+ as DASHDBPASS) and open the Spark_KMeansSample.ipynb notebook.
  Watch the output of the notebook container while the notebook kernel launches a Toree server inside dashDB
  and the browser title for the notebook still displays "(Starting) <notebook name>".
  Note that it can take more than a minute before the kernel is fully started and responsive.
