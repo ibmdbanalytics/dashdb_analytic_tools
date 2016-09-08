@@ -132,6 +132,9 @@ includes two additional command line scripts:
 Before you run the scripts, edit the settings.sh script that provides the environment variables to
 connect to dashDB local from your local system
 
+In order to flag certain cells to NOT be exported because they contain e.g. visualization or interaction elements or because they have some Jupyter magics that won't work in a standalone Spark application you can add the comment
+  `//NOT-FOR-APP`
+in these cells.
 
 # Additional configuration options
 
