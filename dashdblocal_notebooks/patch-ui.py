@@ -14,9 +14,9 @@ print("Patching {0}".format(PATCH_TARGET))
 if os.path.isfile(PATCH_BAK):
 	print("File already patched");
 else:
-	DASHDBHOST = os.environ.get('DASHDBHOST')
+	DASHDBHOST = os.environ.get('DASHDBHOST') or 'localhost'
 	DASHDBUSER = os.environ.get('DASHDBUSER')
-	if(not DASHDBHOST or DASHDBHOST =='localhost'): DASHDBHOST = socket.getfqdn()
+	if(DASHDBHOST == 'localhost' or DASHDBHOST =='127.0.0.1'): DASHDBHOST = socket.getfqdn()
 	if (not DASHDBUSER): sys.exit("DASHDBUSER variable must be defined")
 	dashdb_header_line = ('  <div id="dashdb-header" class="container">Notebook server for {0}@{1}</div>\n'
 						.format(DASHDBUSER, DASHDBHOST))

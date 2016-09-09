@@ -35,10 +35,9 @@ if (len(sys.argv) != 2): usage()
 
 upload_file = sys.argv[1]
 
-DASHDBHOST = os.environ.get('DASHDBHOST')
+DASHDBHOST = os.environ.get('DASHDBHOST') or 'localhost'
 DASHDBUSER = os.environ.get('DASHDBUSER')
 DASHDBPASS = os.environ.get('DASHDBPASS')
-if(not DASHDBHOST): DASHDBHOST='localhost'; print("Using default localhost for DASHDBHOST")
 if (not DASHDBUSER or not DASHDBPASS): sys.exit("DASHDBUSER and DASHDBPASS variables must be defined")
 
 try:

@@ -12,7 +12,7 @@ HOME = os.getenv('HOME')
 APPDIR = HOME + '/projects/sparkapp'
 SOURCEFILE = APPDIR + '/src/main/scala/notebook.scala'
 
-DASHDBHOST = os.environ.get('DASHDBHOST')
+DASHDBHOST = os.environ.get('DASHDBHOST') or 'localhost'
 DASHDBUSER = os.environ.get('DASHDBUSER')
 
 

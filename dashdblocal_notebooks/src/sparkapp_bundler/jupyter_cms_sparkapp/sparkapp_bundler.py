@@ -109,7 +109,9 @@ class ScalaAppPreprocessor(Preprocessor):
     """A preprocessor to remove some of the cells of a notebook"""
 
     def keepCell(self, cell):
-        return not cell.source.startswith(FILTER_CELL_MARKER)
+        # filter out cells marked by the user and cell magics
+        return (not cell.source.startswith(FILTER_CELL_MARKER)
+            and not cell.source.startswith('%%'))
 
     def preprocess(self, nb, resources):
         nb.cells = filter(self.keepCell, nb.cells)

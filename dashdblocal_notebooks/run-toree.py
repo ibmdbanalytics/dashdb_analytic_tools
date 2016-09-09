@@ -16,10 +16,9 @@ conn_file_in = sys.argv[1]
 # extra arguments are passed on to toree kernel
 extra_args = sys.argv[2:]
 
-DASHDBHOST = os.environ.get('DASHDBHOST')
+DASHDBHOST = os.environ.get('DASHDBHOST') or 'localhost'
 DASHDBUSER = os.environ.get('DASHDBUSER')
 DASHDBPASS = os.environ.get('DASHDBPASS')
-if(not DASHDBHOST): DASHDBHOST='localhost'
 if (not DASHDBUSER or not DASHDBPASS): sys.exit("DASHDBUSER and DASHDBPASS variables must be defined")
 IS_REMOTE_KERNEL = (DASHDBHOST != "localhost" and DASHDBHOST != "127.0.0.1")
 
@@ -75,10 +74,10 @@ def monitor_kernel():
 		if (resp.json().get('status') != 'running'):
 			print(resp.text)
 			break
-		if (i == 0):
-			print(resp.text)  #  print message every minute that we're still alive
-			i = 60
-		i -= 1
+#		if (i == 0):
+#			print(resp.text)  #  print message every minute that we're still alive
+#			i = 60
+#		i -= 1
 		time.sleep(1) # sleep a second
 	submissionid = None
 

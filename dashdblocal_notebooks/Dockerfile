@@ -76,6 +76,8 @@ USER $NB_USER
 RUN bash -c "mkdir -p $PROJECTS_DIR/sparkapp/src/main/{java,scala,resources}" && \
 	cp $PROJECTS_DIR/build.sh $PROJECTS_DIR/sparkapp/
 
+# avoid warning during notebook start
+RUN pip install widgetsnbextension
 RUN pip install /src/sparkapp_bundler
 
 RUN jupyter serverextension enable --py jupyter_cms_sparkapp --sys-prefix
