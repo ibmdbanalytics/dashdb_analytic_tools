@@ -2,13 +2,17 @@
 # LICENSE: BSD-3, https://opensource.org/licenses/BSD-3-Clause
 
 FROM jupyter/base-notebook
-# tested with jupyter/base-notebook ID 27f6af6e1dcc
-
+# tested with version:
+# FROM jupyter/base-notebook:749017d878d6
 USER root
 
+# sort packages alphabetically following docker convention
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    unzip zip default-jre-headless curl
+    curl \
+    default-jre-headless \
+    unzip \
+    zip
 
 # sbt is not in repo for Trusty
 RUN cd /tmp && \
