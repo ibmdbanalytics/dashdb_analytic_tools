@@ -180,6 +180,14 @@ the recommended place for keeping the files is the user's home directory:
   Notebooks are now stored in /mnt/clusterfs/home/bluuser1/work, which is inside the home folder
   of user bluuser1 in the dasdDB container. The directory is created if it does not exist.
 
+## HTTPS support and other options from jupyter/base-notebook
+
+Most of the configuration options supported by the base image
+[jupyter/base-notebook](https://github.com/jupyter/docker-stacks/tree/master/base-notebook#docker-options)
+also apply to this notebook container. You can specify `-e USE_HTTPS=yes` to switch
+the notebook server to HTTPS with a self-signed certificate and you can use the process
+described there for installing your own certificate.
+
 ## Remote kernel
 
 The notebook container also includes basic support for remote kernels by forwarding the Jupyter notebook
