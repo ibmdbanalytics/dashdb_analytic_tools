@@ -4,9 +4,11 @@
 
 # Upload Toree kernel to dashDB local via REST API
 
+import warnings
 import sys, os
 import json, requests
 from requests.auth import HTTPBasicAuth
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 def usage():
 	sys.exit('''
@@ -30,19 +32,21 @@ def upload(upload_file):
 	return resp.text
 
 
-
-if (len(sys.argv) != 2): usage()
-
-upload_file = sys.argv[1]
-
-DASHDBHOST = os.environ.get('DASHDBHOST') or 'localhost'
-DASHDBUSER = os.environ.get('DASHDBUSER')
-DASHDBPASS = os.environ.get('DASHDBPASS')
-if (not DASHDBUSER or not DASHDBPASS): sys.exit("DASHDBUSER and DASHDBPASS variables must be defined")
-
-try:
-	print("Uploading {0} to {1} apps directory on {2}".format(upload_file, DASHDBUSER, DASHDBHOST))
-	resp = upload(upload_file)
-	print("Upload complete: " + resp)
-except requests.exceptions.ConnectionError:
-	sys.exit("Could not connect to dashDB server {0}".format(DASHDBHOST))
+if __name__ == "__main__":
+	if (len(sys.argv) != 2): usage()
+	
+	upload_file = sys.argv[1]
+	
+	DASHDBHOST = os.environ.get('DASHDBHOST') or 'localhost'
+	DASHDBUSER = os.environ.get('DASHDBUSER')
+	DASHDBPASS = os.environ.get('DASHDBPASS')
+	if (not DASHDBUSER or not DASHDBPASS): sys.exit("DASHDBUSER and DASHDBPASS variables must be defined")
+	
+	warnings.filterwarnings('ignore', category=InsecureRequestWarning)
+	
+	try:
+		print("Uploading {0} to {1} apps directory on {2}".format(upload_file, DASHDBUSER, DASHDBHOST))
+		resp = upload(upload_file)
+		print("Upload complete: " + resp)
+	except requests.exceptions.ConnectionError:
+		sys.exit("Could not connect to dashDB server {0}".format(DASHDBHOST))

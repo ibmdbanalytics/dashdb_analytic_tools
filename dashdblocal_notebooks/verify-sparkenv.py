@@ -5,9 +5,11 @@
 # Use the dashDB analytics REST API to check that the dashDB Spark support
 # is configured and accessible
 
+import warnings
 import sys, os
 import json, requests
 from requests.auth import HTTPBasicAuth
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 def verify_sparkenv():
 	auth = HTTPBasicAuth(DASHDBUSER, DASHDBPASS)
@@ -27,16 +29,18 @@ def verify_sparkenv():
 	if (resp.status_code != requests.codes.ok):
 		sys.exit("Error accessing dashDB analytics REST API on {0}: {1}".format(DASHDBHOST, resp))
 
-
-DASHDBHOST = os.environ.get('DASHDBHOST')
-DASHDBUSER = os.environ.get('DASHDBUSER')
-DASHDBPASS = os.environ.get('DASHDBPASS')
-if(not DASHDBHOST): DASHDBHOST='localhost'; print("Using default localhost for DASHDBHOST")
-if (not DASHDBUSER or not DASHDBPASS): sys.exit("DASHDBUSER and DASHDBPASS variables must be defined")
-
-try:
-	print("Verifying Spark environment on {0}".format(DASHDBHOST))
-	verify_sparkenv();
-	print("Success.")
-except requests.exceptions.ConnectionError:
-	sys.exit("Could not connect to dashDB server {0}".format(DASHDBHOST))
+if __name__ == "__main__":
+	DASHDBHOST = os.environ.get('DASHDBHOST')
+	DASHDBUSER = os.environ.get('DASHDBUSER')
+	DASHDBPASS = os.environ.get('DASHDBPASS')
+	if(not DASHDBHOST): DASHDBHOST='localhost'; print("Using default localhost for DASHDBHOST")
+	if (not DASHDBUSER or not DASHDBPASS): sys.exit("DASHDBUSER and DASHDBPASS variables must be defined")
+	
+	warnings.filterwarnings('ignore', category=InsecureRequestWarning)
+	
+	try:
+		print("Verifying Spark environment on {0}".format(DASHDBHOST))
+		verify_sparkenv();
+		print("Success.")
+	except requests.exceptions.ConnectionError:
+		sys.exit("Could not connect to dashDB server {0}".format(DASHDBHOST))
