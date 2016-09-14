@@ -196,11 +196,26 @@ Running the notebook container on the same docker host with `--net=host` is curr
 
 # Limitations
 
-## No authentication
+## Limited number of parallel Spark applications
 
-Currently, the notebook server does not require any form of authentication. If you know the correct hostname and port,
-you can connect to the notebook server and therefore submit arbitrary code to the dashDB Spark engine under the user
-ID that was specified when starting the container.
+The number of Spark applications that can execute in parallel on a Spark cluster is limited by the available memory.
+This limit also applies to Spark notebook kernels. On dashDB local, the maximum number of all parallel Spark applications
+(including notebooks) for _all users_ is usually 3 to 5, depending on the system configuration. 
+
+When that number has been reached, starting additional Spark kernels will fail and you see a message in your notebook
+that the "Kernel has failed and could not be restarted". Unfortunately, Jupyter does not currently allow kernels to report
+error information when they fail to start, so you can only diagnose the problem by looking at the notebook server log with
+`docker log <container-name>`. If the maximum number of parallel Spark applications has been exceeded, you should see
+a message like the following:
+
+  `Failed to submit Spark kernel job: {"statusDesc":"Attempt to submit the application failed because the maximum number of running applications has already been reached.` ...
+
+Note: be sure to shut down Spark kernels when you are finished with a notebook, either by selecting 
+"File -> Close and Halt" in the Notebook window or by marking the notebook and selecting "Shutdown" 
+from the main notebook server view. 
+You can also kill "orphaned" Spark kernel applications from the Spark monitoring page; see the information above under 
+[Monitoring](#monitoring)
+
 
 ## No support for IPython specific syntax
 
