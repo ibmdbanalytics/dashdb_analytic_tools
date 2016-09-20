@@ -42,7 +42,7 @@ def start_kernel(toree_args):
 	if (resp_data.get('status') != 'submitted'):
 		sys.exit ("Failed to submit Spark kernel job: " + resp.text)
 
-	submissionid = resp_data['submissionid']
+	submissionid = resp_data['submissionId']
 	print("Started Spark kernel with submission id " + submissionid)
 	print(resp.text)
 
