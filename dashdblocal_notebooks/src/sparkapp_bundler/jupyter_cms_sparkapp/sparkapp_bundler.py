@@ -1,11 +1,9 @@
 # (c) Copyright IBM Corporation 2016
 # LICENSE: BSD-3, https://opensource.org/licenses/BSD-3-Clause
 
-import os, io, glob, json, subprocess
-from nbconvert import TemplateExporter
+import warnings, os, io, glob, json, subprocess
+from nbconvert import TemplateExporter, preprocessors
 from jinja2 import FileSystemLoader
-from nbconvert.preprocessors import Preprocessor
-from nbconvert import preprocessors
 from . import SPARKAPP_LOG
 
 # path for looking up jinja2 template
@@ -16,12 +14,13 @@ FILTER_CELL_MARKER = "//NOT-FOR-APP"
 
 def export_to_scala(absolute_notebook_path):
     '''convert the notebook source to scala'''
-
-    exporter = TemplateExporter(extra_loaders=[FileSystemLoader(INSTALLDIR)],
-                                preprocessors=[ScalaAppPreprocessor])
-    exporter.template_file = 'scala_sparkapp'
-    (body, resources) = exporter.from_file(absolute_notebook_path)
-    return body
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', category=DeprecationWarning)
+        exporter = TemplateExporter(extra_loaders=[FileSystemLoader(INSTALLDIR)],
+                                    preprocessors=[ScalaAppPreprocessor])
+        exporter.template_file = 'scala_sparkapp'
+        (body, resources) = exporter.from_file(absolute_notebook_path)
+        return body
 
 
 def export_to_scalafile(absolute_notebook_path, scala_source):
@@ -105,7 +104,7 @@ def add_launcher_scripts(project_dir, jarfile, appname):
     os.chmod(scriptfile, 0o755)
 
 
-class ScalaAppPreprocessor(Preprocessor):
+class ScalaAppPreprocessor(preprocessors.Preprocessor):
     """A preprocessor to remove some of the cells of a notebook"""
 
     def keepCell(self, cell):

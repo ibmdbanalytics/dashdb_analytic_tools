@@ -48,20 +48,21 @@ def bundle(handler, absolute_notebook_path):
     resource = os.path.basename(jarfile)
     handler.write("Successfully uploaded {0} to {1}!\n\n".format(resource, DASHDBHOST))
     SPARKAPP_LOG.info("Upload output: %s", upload.stdout)
-    handler.write("\n\nTo run your spark application, use one of the followint three alternatives:\n\n\n"
-                  "1. Submit as REST call using curl command line tool. First set the environment valiable DASHDBPASS and then use the following command:\n\n"
-                  "curl -k -v -u {0}:$DASHDBPASS -XPOST https://{1}:8443/dashdb-api/analytics/public/apps/submit \\\n"
-                  "--header 'Content-Type:application/json;charset=UTF-8'  \\\n"
-                  "--data '{{ \"appResource\" : \"{2}\", \"mainClass\" : \"SampleApp\" }}'\n\n"
-                  .format(DASHDBUSER, DASHDBHOST, resource))
-    handler.write("2. Submit via dashDB's spark-submit.sh command line tool. Run the following sequence of commands:\n\n"
-                  "export DASHDBURL=https://{0}:8443\n"
-                  "export DASHDBUSER={1}\n"
-                  "export DASHDBPASS=<paste password here>\n"
-                  "spark-submit.sh {2} --class SampleApp\n\n"
-                  .format(DASHDBHOST, DASHDBUSER, resource))
-    handler.write("3. Submit via stored procedure in dashDB. Connect to the dashDB database on {0} as user {1} and then run:\n\n"
-                  "CALL IDAX.SPARK_SUBMIT(?, '{{ \"appResource\" : \"{2}\", \"mainClass\" : \"SampleApp\"}}')\n"
+    
+    submit_commands = [
+        "export DASHDBURL=https://{0}:8443".format(DASHDBHOST),
+        "export DASHDBUSER={0}".format(DASHDBUSER),
+        "spark-submit.sh {0} --class SampleApp".format(resource),
+    ]
+    handler.write("\n\nTo run your spark application, use one of the following alternatives:\n\n\n")
+    handler.write("- Submit via dashDB's spark-submit.sh command line tool. Run the following sequence of commands:\n\n")
+    for cmd in submit_commands:
+        handler.write("  {0}\n".format(cmd))
+    handler.write("\n- Submit via stored procedure in dashDB. Connect to the dashDB database on {0} as user {1} and then run:\n\n"
+                  "  CALL IDAX.SPARK_SUBMIT(?, '{{ \"appResource\" : \"{2}\", \"mainClass\" : \"SampleApp\"}}')\n"
                   .format(DASHDBHOST, DASHDBUSER, resource))
     handler.finish()
+    
+    # for testing: return the submit commands
+    return submit_commands
 
