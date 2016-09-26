@@ -45,10 +45,10 @@ Follow these steps to get your own Docker container instance:
   `docker run -it --rm --net=host -e DASHDBUSER=<user> -e DASHDBPASS=<password> dashdblocal_notebook`
 
  It is recommended to start the container as a foreground process for the first time. If you have verified that the
- container works and want to run it as a background service, replace the `-i --rm`  arguments with `-d` and give it
+ container works and want to run it as a background service, replace the `-it --rm`  arguments with `-d` and give it
  a name for easier referencing:
 
-  `docker run -it --rm --net=host -e DASHDBUSER=<user> -e DASHDBPASS=<password> --name <user>_notebook dashdblocal_notebook`
+  `docker run -d --net=host -e DASHDBUSER=<user> -e DASHDBPASS=<password> --name <user>_notebook dashdblocal_notebook`
 
 
  Note that the dashDB local container as well as the notebook container use `--net=host` so they share
