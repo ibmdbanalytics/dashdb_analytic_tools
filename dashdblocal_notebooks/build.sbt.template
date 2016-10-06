@@ -1,11 +1,12 @@
 name := "<appname>"
- 
+
 version := "1.0"
- 
-scalaVersion := "2.11.8"
- 
+
+// this is the scala dependency of Spark 1.6.2
+scalaVersion := "2.10.5"
+
 libraryDependencies ++= {
-    val sparkVersion =  "1.6.1"
+    val sparkVersion =  "1.6.2"
     Seq(
         "org.apache.spark" %% "spark-core" % sparkVersion,
         "org.apache.spark" %% "spark-sql" % sparkVersion,

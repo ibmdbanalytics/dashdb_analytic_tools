@@ -7,23 +7,7 @@ import _thread, sys, os, socket, time
 import signal, atexit
 import json, requests
 from requests.auth import HTTPBasicAuth
-
-
-if (len(sys.argv) < 2): sys.exit("Expecting connection file name as first argument")
-
-# comm file is first argument
-conn_file_in = sys.argv[1]
-# extra arguments are passed on to toree kernel
-extra_args = sys.argv[2:]
-
-DASHDBHOST = os.environ.get('DASHDBHOST')
-DASHDBUSR = os.environ.get('DASHDBUSR')
-DASHDBPW = os.environ.get('DASHDBPW')
-if(not DASHDBHOST): DASHDBHOST='localhost'
-if (not DASHDBUSR or not DASHDBPW): sys.exit("DASHDBUSR and DASHDBPW variables must be defined")
-IS_REMOTE_KERNEL = (DASHDBHOST != "localhost" and DASHDBHOST != "127.0.0.1")
-
-jobid = None
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 
 # upload connection JSON file to dashDB local
@@ -43,13 +27,13 @@ def upload_conn_info(conn_file_name, conn_file_content):
 
 # start toree server on dashDB local
 def start_kernel(toree_args):
-	global jobid
+	global submissionid
 	req_data = {
 		'appArgs' : toree_args,
 		'appResource' : 'toree.jar',
 		'mainClass' : 'org.apache.toree.Main'
 	}
-	resp = session.post("https://{0}:8443/clues/public/jobs/submit".format(DASHDBHOST),
+	resp = session.post("https://{0}:8443/dashdb-api/analytics/public/apps/submit".format(DASHDBHOST),
 		json=req_data, auth=auth, verify=False)
 
 	if (resp.status_code != requests.codes.ok):
@@ -58,39 +42,37 @@ def start_kernel(toree_args):
 	if (resp_data.get('status') != 'submitted'):
 		sys.exit ("Failed to submit Spark kernel job: " + resp.text)
 
-	jobid = resp_data['jobid']
-	print("Started Spark kernel job with id" + jobid)
+	submissionid = resp_data['submissionId']
+	print("Started Spark kernel with submission id " + submissionid)
 	print(resp.text)
 
 
 # poll toree server status and wait for termination
 def monitor_kernel():
-	global jobid
+	global submissionid
 	i = 0
 	while (True):
-		with warnings.catch_warnings():
-			warnings.simplefilter("ignore")
-			resp = session.get("https://{0}:8443/clues/public/monitoring/job_status".format(DASHDBHOST),
-				params={'jobid': jobid}, auth=auth, verify=False)
+		resp = session.get("https://{0}:8443/dashdb-api/analytics/public/monitoring/app_status".format(DASHDBHOST),
+			params={'submissionid': submissionid}, auth=auth, verify=False)
 		if (resp.json().get('status') != 'running'):
 			print(resp.text)
 			break
-		if (i == 0):
-			print(resp.text)  #  print message every minute that we're still alive
-			i = 60
-		i -= 1
+#		if (i == 0):
+#			print(resp.text)  #  print message every minute that we're still alive
+#			i = 60
+#		i -= 1
 		time.sleep(1) # sleep a second
-	jobid = None
+	submissionid = None
 
 
 # explicitly request to shut down the toree server
 def stop_kernel():
-	global jobid
+	global submissionid
 	print("Shutting down")
-	if (jobid):
+	if (submissionid):
 		print("Trying to stop kernel")
-		resp = session.post("https://{0}:8443/clues/public/jobs/cancel".format(DASHDBHOST),
-			params={'jobid': jobid}, auth=auth, verify=False)
+		resp = session.post("https://{0}:8443/dashdb-api/analytics/public/apps/cancel".format(DASHDBHOST),
+			params={'submissionid': submissionid}, auth=auth, verify=False)
 		print(resp.text)
 
 
@@ -146,31 +128,48 @@ def forward_connection(source, destination, id):
 		destination.close()
 
 
-conn_file_name = os.path.basename(conn_file_in)
-conn_file_out = "/mnt/blumeta0/home/{0}/tmp/{1}".format(DASHDBUSR, conn_file_name)
+if __name__ == "__main__":
+	if(len(sys.argv) < 2): sys.exit("Expecting connection file name as first argument")
 
-session = requests.Session()
-auth = HTTPBasicAuth(DASHDBUSR, DASHDBPW)
-
-# handle kernel interrupting explicitly
-signal.signal(signal.SIGINT, interrupted)
-# if the wrapper script is terminated externally, then we want to shut down the toree kernel as well
-atexit.register(stop_kernel)
-
-
-print("Uploading {0} to {1} on {2}".format(conn_file_in, conn_file_out, DASHDBHOST))
-with open(conn_file_in, 'r') as f:
-	conn_file_content = json.loads(f.read())
-upload_conn_info(conn_file_name, conn_file_content)
-
-toree_args = [ '--profile', conn_file_out ] + extra_args
-print("Starting Spark kernel with arguments " + str(toree_args))
-start_kernel(toree_args)
-
-if (IS_REMOTE_KERNEL):
-	forward_ports(conn_file_content)
-
-# monitor job
-monitor_kernel()
-print("Spark kernel has terminated")
+	# comm file is first argument
+	conn_file_in = sys.argv[1]
+	# extra arguments are passed on to toree kernel
+	extra_args = sys.argv[2:]
+	
+	DASHDBHOST = os.environ.get('DASHDBHOST') or 'localhost'
+	DASHDBUSER = os.environ.get('DASHDBUSER')
+	DASHDBPASS = os.environ.get('DASHDBPASS')
+	if (not DASHDBUSER or not DASHDBPASS): sys.exit("DASHDBUSER and DASHDBPASS variables must be defined")
+	IS_REMOTE_KERNEL = (DASHDBHOST != "localhost" and DASHDBHOST != "127.0.0.1")
+	
+	submissionid = None
+	
+	conn_file_name = os.path.basename(conn_file_in)
+	conn_file_out = "/mnt/blumeta0/home/{0}/tmp/{1}".format(DASHDBUSER, conn_file_name)
+	
+	session = requests.Session()
+	auth = HTTPBasicAuth(DASHDBUSER, DASHDBPASS)
+	
+	# handle kernel interrupting explicitly
+	signal.signal(signal.SIGINT, interrupted)
+	# if the wrapper script is terminated externally, then we want to shut down the toree kernel as well
+	atexit.register(stop_kernel)
+	
+	warnings.filterwarnings('ignore', category=InsecureRequestWarning)
+	
+	print("Uploading {0} to {1} on {2}".format(conn_file_in, conn_file_out, DASHDBHOST))
+	with open(conn_file_in, 'r') as f:
+		conn_file_content = json.loads(f.read())
+	upload_conn_info(conn_file_name, conn_file_content)
+	
+	toree_args = [ '--profile', conn_file_out ] + extra_args
+	print("Starting Spark kernel with arguments " + str(toree_args))
+	start_kernel(toree_args)
+	
+	if (IS_REMOTE_KERNEL):
+		forward_ports(conn_file_content)
+	
+	# monitor job
+	monitor_kernel()
+	print("Spark kernel has terminated")
 

@@ -12,8 +12,8 @@ HOME = os.getenv('HOME')
 APPDIR = HOME + '/projects/sparkapp'
 SOURCEFILE = APPDIR + '/src/main/scala/notebook.scala'
 
-DASHDBHOST = os.environ.get('DASHDBHOST')
-DASHDBUSR = os.environ.get('DASHDBUSR')
+DASHDBHOST = os.environ.get('DASHDBHOST') or 'localhost'
+DASHDBUSER = os.environ.get('DASHDBUSER')
 
 
 @gen.coroutine
@@ -27,16 +27,18 @@ def bundle(handler, absolute_notebook_path):
     '''
 
     #TEMPORARY hardcode path for development
-    #absolute_notebook_path = '/home/jovyan/work/notebooks/Spark_KMeansSample.ipynb'
+    #absolute_notebook_path = '/home/jovyan/work/Spark_KMeansSample.ipynb'
     notebook_filename = os.path.splitext(os.path.basename(absolute_notebook_path))[0]
 
+    handler.set_header('Content-Type', 'text/plain; charset=us-ascii ')
+    handler.write("Building scala application...\n")
+    handler.flush()
     export_to_scalafile(absolute_notebook_path, SOURCEFILE)
     jarfile = build_scala_project(handler, APPDIR, SOURCEFILE, notebook_filename)
     if not jarfile: return
 
     upload = subprocess.run(["upload-sparkapp.py", jarfile],
                             stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    handler.set_header('Content-Type', 'text/plain; charset=us-ascii ')
     if (upload.returncode != 0):
         handler.write("Failed!\n\n")
         handler.write(upload.stdout)
@@ -46,10 +48,21 @@ def bundle(handler, absolute_notebook_path):
     resource = os.path.basename(jarfile)
     handler.write("Successfully uploaded {0} to {1}!\n\n".format(resource, DASHDBHOST))
     SPARKAPP_LOG.info("Upload output: %s", upload.stdout)
-    handler.write("\n\nTo start your spark application, you can set DASHDBPW and use the following command:\n\n"
-                  "curl -k -v -u {0}:$DASHDBPW -XPOST https://{1}:8443/clues/public/jobs/submit \\\n"
-                  "--header 'Content-Type:application/json;charset=UTF-8'  \\\n"
-                  "--data '{{ \"appResource\" : \"{2}\", \"mainClass\" : \"SampleApp\" }}'\n"
-                  .format(DASHDBUSR, DASHDBHOST, resource))
+    
+    submit_commands = [
+        "export DASHDBURL=https://{0}:8443".format(DASHDBHOST),
+        "export DASHDBUSER={0}".format(DASHDBUSER),
+        "spark-submit.sh {0} --class SampleApp".format(resource),
+    ]
+    handler.write("\n\nTo run your spark application, use one of the following alternatives:\n\n\n")
+    handler.write("- Submit via dashDB's spark-submit.sh command line tool. Run the following sequence of commands:\n\n")
+    for cmd in submit_commands:
+        handler.write("  {0}\n".format(cmd))
+    handler.write("\n- Submit via stored procedure in dashDB. Connect to the dashDB database on {0} as user {1} and then run:\n\n"
+                  "  CALL IDAX.SPARK_SUBMIT(?, '{{ \"appResource\" : \"{2}\", \"mainClass\" : \"SampleApp\"}}')\n"
+                  .format(DASHDBHOST, DASHDBUSER, resource))
     handler.finish()
+    
+    # for testing: return the submit commands
+    return submit_commands
 
