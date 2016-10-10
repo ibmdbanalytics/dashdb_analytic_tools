@@ -17,12 +17,12 @@ RUN rm -rf /var/lib/apt/lists/ \
   && apt-get update \
   && apt-get -y install procps \
   && apt-get -y install unixodbc-dev \
-##  && apt-get -y install ksh \
+  && (apt-get -y install ksh; true) \
   && apt-get -y install ssh \
   && apt-get -y install libxml2 \
   && R -f /install.R \
   && tar -xvzf ibm_data_server_driver_package_linuxx64_v11.1.tar.gz \
-  && dsdriver/installDSDriver \
+  && /bin/ksh dsdriver/installDSDriver \
   && printf "[DASHDB]\nDriver = /dsdriver/lib/libdb2o.so\n" >> /etc/odbc.ini \
   && adduser rstudio sudo \
   && apt-get clean \
