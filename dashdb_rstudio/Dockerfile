@@ -9,6 +9,7 @@ MAINTAINER "Torsten Steinbach" torsten@de.ibm.com
 ## Install some system commands
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
+    openjdk-8-jre-headless \
     libxml2 \
     mksh \
     procps \
@@ -26,6 +27,14 @@ RUN tar -xvzf ibm_data_server_driver_package_linuxx64_v11.1.tar.gz \
     && dsdriver/installDSDriver \
     && printf "[DASHDB]\nDriver = /dsdriver/lib/libdb2o.so\n" >> /etc/odbc.ini \
     && adduser rstudio sudo
+
+ENV APACHE_SPARK_VERSION 2.0.0
+ENV SPARK_HOME /usr/local/spark
+RUN cd /tmp && \
+        wget -q http://d3kbcqa49mib13.cloudfront.net/spark-${APACHE_SPARK_VERSION}-bin-hadoop2.7.tgz && \
+        tar xzf spark-${APACHE_SPARK_VERSION}-bin-hadoop2.7.tgz -C /usr/local && \
+        rm spark-${APACHE_SPARK_VERSION}-bin-hadoop2.7.tgz
+RUN cd /usr/local && ln -s spark-${APACHE_SPARK_VERSION}-bin-hadoop2.7 spark
 
 ADD samples /home/rstudio/samples
 
