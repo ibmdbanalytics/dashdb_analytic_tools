@@ -64,7 +64,7 @@ COPY kernel-scala.json /home/$NB_USER/.local/share/jupyter/kernels/idax-scala/ke
 COPY kernel-python.json /home/$NB_USER/.local/share/jupyter/kernels/idax-python/kernel.json
 COPY verify-sparkenv.py upload-sparkapp.py patch-ui.py run-toree.py launch-with-idax.sh /usr/local/bin/
 COPY Spark_KMeansSample.ipynb ./
-COPY Tornado+Clustering.ipynb ./
+COPY "Tornado Clustering.ipynb" ./
 
 # copy jupyter CMS extensions
 ADD src /src
