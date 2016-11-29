@@ -16,6 +16,7 @@ IMAGE_NAME = dashdblocal_notebook:dev
 
 # need bash for the recipes
 SHELL = /bin/bash
+SUBMIT_SCRIPT = output/spark-submit.sh
 
 CONTAINER_CFG := -e DASHDBHOST=$(DASHDBHOST) -e DASHDBUSER=$(DASHDBUSER) -e DASHDBPASS=$(DASHDBPASS)
 
@@ -84,8 +85,8 @@ test_notebooks:
 	
 # get spark-submit script from the dashDB server
 get_launcher:
-	ssh root@$(DASHDBHOST) docker cp idaxDashDB:/opt/ibm/dashdb_spark/bin/spark-submit.sh /tmp/
-	scp root@$(DASHDBHOST):/tmp/spark-submit.sh output/
+	curl -k -v -o $(SUBMIT_SCRIPT) -u $(DASHDBUSER):$(DASHDBPASS) $(DASHDBURL)/blushiftservices/userfiledownload.do?path=spark-submit.sh
+	chmod a+x $(SUBMIT_SCRIPT)
 	
 # test the bundlers. need the downloaded spark-submit script in the PATH
 test_bundlers:

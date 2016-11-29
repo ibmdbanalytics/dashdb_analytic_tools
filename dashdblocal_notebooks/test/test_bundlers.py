@@ -17,8 +17,11 @@ class TestSparkappBundler(unittest.TestCase):
 
     def handlerWrite(self, text):
         print(text, end='')
-        self.handler_output += text
-    
+        if (isinstance(text, bytes)):
+            self.handler_output += text.decode('UTF-8')
+        else:
+            self.handler_output += text
+
     def testSparkappUpload(self):
         print("Testing SparkApp upload")
         handler = mock.create_autospec(tornado.web.RequestHandler)
@@ -30,8 +33,9 @@ class TestSparkappBundler(unittest.TestCase):
         self.assertIn("Successfully uploaded spark_kmeanssample", self.handler_output)
         self.assertIn("spark-submit", submit_commands[-1])
         
-        print("Submitting uploaded application")
-        submit_output_bin = subprocess.check_output(" && ".join(submit_commands), shell=True)
+        submit_line = " && ".join(submit_commands)
+        print("Submitting uploaded application as\n\t{0}".format(submit_line))
+        submit_output_bin = subprocess.check_output(submit_line, shell=True)
         submit_output = submit_output_bin.decode()
         print (submit_output)
         self.assertIn("Status: submitted", submit_output)

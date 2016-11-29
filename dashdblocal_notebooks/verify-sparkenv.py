@@ -11,6 +11,9 @@ import json, requests
 from requests.auth import HTTPBasicAuth
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
+MINUMUM_BUILD_NUMBER = '141'
+MINUMUM_DASHDB_LEVEL = '1.4.0'
+
 def verify_sparkenv():
 	auth = HTTPBasicAuth(DASHDBUSER, DASHDBPASS)
 	resp = requests.get("https://{0}:8443/dashdb-api/analytics/public/configuration/version".format(DASHDBHOST),
@@ -23,11 +26,23 @@ def verify_sparkenv():
 		resp2 = requests.get("https://{0}:8443/clues/public/configuration/version".format(DASHDBHOST),
 						auth=auth, verify=False)
 		if (resp2.status_code == requests.codes.ok):
-			sys.exit("The dashDB version running on {0} is not compatible with this notebook. "
-					 "Upgrade your dashDB local docker images in order to use this notebook"
-					 .format(DASHDBHOST))
+			newer_dashdb_required()
 	if (resp.status_code != requests.codes.ok):
 		sys.exit("Error accessing dashDB analytics REST API on {0}: {1}".format(DASHDBHOST, resp))
+
+	spark_build = next ((x.get('spark_build_number') for x in resp.json().get('IDAX') if x.get('spark_build_number')), 
+						"000_unknown")
+	print("Detected build {0}".format(spark_build))
+	if (spark_build < MINUMUM_BUILD_NUMBER):
+		newer_dashdb_required()
+
+def newer_dashdb_required():
+	sys.exit("The dashDB version running on {0} is not compatible with this notebook; "
+			 "the version must be at least {1}.\n"
+			 "Check your dashDB version with 'docker exec <container_name> version'.\n"
+			 "Upgrade your dashDB local docker images in order to use this notebook."
+			 .format(DASHDBHOST, MINUMUM_DASHDB_LEVEL))
+
 
 if __name__ == "__main__":
 	DASHDBHOST = os.environ.get('DASHDBHOST')

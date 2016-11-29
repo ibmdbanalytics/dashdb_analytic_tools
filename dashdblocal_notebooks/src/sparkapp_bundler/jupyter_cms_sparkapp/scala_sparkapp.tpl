@@ -14,9 +14,7 @@ import org.apache.spark.sql._
 object SampleApp {
   def main(arguments: Array[String]) {
 
-    val sparkConf = new SparkConf().setAppName("SampleApp")
-    val sc = new SparkContext(sparkConf)
-    val sqlContext = SQLContext.getOrCreate(sc)
+   val spark = SparkSession.builder().appName("SampleApp").getOrCreate()
 
 {% endblock header %}
 

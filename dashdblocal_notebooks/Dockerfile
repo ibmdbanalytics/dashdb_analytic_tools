@@ -3,7 +3,7 @@
 
 FROM jupyter/base-notebook
 # tested with version:
-# FROM jupyter/base-notebook:749017d878d6
+# FROM jupyter/base-notebook:c411f52fcc93
 USER root
 
 # sort packages alphabetically following docker convention
@@ -41,37 +41,31 @@ RUN cd tmp &&  \
 RUN rm -rf tmp
 
 # set up jupyter environment
-RUN pip install --pre toree
 RUN pip install jupyter_cms
 RUN jupyter cms quick-setup --sys-prefix
+# avoid warning during notebook start
+RUN pip install widgetsnbextension
 
 
 USER root
 
-# modify log4.properties in toree so we get Spark INFO output expected by dashDB Spark support
-RUN	cp /opt/conda/lib/python3.5/site-packages/toree/lib/toree-assembly-*.jar /usr/local/lib/toree.jar
-RUN cd /tmp && \
-	unzip /usr/local/lib/toree.jar log4j.properties && \
-	echo "log4j.logger.org.apache.spark=INFO" >> log4j.properties && \
-	zip -r /usr/local/lib/toree.jar log4j.properties
-RUN rm /tmp/log4j.properties
-
 ENV PROJECTS_DIR /home/$NB_USER/projects
 
 # copy other files late in the build to avoid cache busting
+COPY toree-assembly-0.2.0.dev1-incubating-SNAPSHOT.jar /usr/local/lib/toree.jar
 COPY build.sbt.template build.sh $PROJECTS_DIR/
 COPY kernel-scala.json /home/$NB_USER/.local/share/jupyter/kernels/idax-scala/kernel.json
 COPY kernel-python.json /home/$NB_USER/.local/share/jupyter/kernels/idax-python/kernel.json
 COPY verify-sparkenv.py upload-sparkapp.py patch-ui.py run-toree.py launch-with-idax.sh /usr/local/bin/
 COPY Spark_KMeansSample.ipynb ./
-COPY "Tornado Clustering.ipynb" ./
+COPY Tornado_Clustering.ipynb ./
 
 # copy jupyter CMS extensions
 ADD src /src
 
 # fix permissions if git repo was checked out as root
 RUN chmod -R a+rX /src
-RUN chmod a+rx /usr/local/bin/*
+RUN chmod a+rx /usr/local/bin/* /usr/local/lib/*
 # fix ownership for all files copied into homedir
 RUN chown -R $NB_USER /home/$NB_USER
 
@@ -81,10 +75,8 @@ USER $NB_USER
 RUN bash -c "mkdir -p $PROJECTS_DIR/sparkapp/src/main/{java,scala,resources}" && \
 	cp $PROJECTS_DIR/build.sh $PROJECTS_DIR/sparkapp/
 
-# avoid warning during notebook start
-RUN pip install widgetsnbextension
+# install and enable spark app bundler
 RUN pip install /src/sparkapp_bundler
-
 RUN jupyter serverextension enable --py jupyter_cms_sparkapp --sys-prefix
 RUN jupyter bundler enable --py jupyter_cms_sparkapp --sys-prefix
 
