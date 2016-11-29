@@ -25,7 +25,7 @@ class TestNotebookUI(unittest.TestCase):
         notebook_url = 'http://localhost:8888'
         print("Accesssing notebook at {0}".format(notebook_url))
         resp = self.sess.get(notebook_url)
-        self.assertIn("Notebook server for {0}@{1}".format(DASHDBUSER, DASHDBHOST), resp.text)
+        self.assertIn("Notebook server for {0}".format(DASHDBUSER, DASHDBHOST), resp.text)
         self.assertIn('<input type="password"', resp.text)
         match = re.search(r'<form action="([^"]+)"', resp.text)
         self.assertTrue(match)
