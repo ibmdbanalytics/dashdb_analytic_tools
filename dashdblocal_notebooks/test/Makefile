@@ -82,7 +82,7 @@ test_container_logs:
 # a few simple checks that the notebook UI is up and running
 test_notebook_ui:
 	@echo -e '\n\n### Checking notebook UI in test container ###'
-	DASHDBHOST=$(DASHDBHOST) DASHDBUSER=$(DASHDBUSER) DASHDBPASS=$(DASHDBPASS) python3 test_notebook_ui.py
+	DASHDBHOST=$(DASHDBHOST) DASHDBUSER=$(DASHDBUSER) DASHDBPASS=$(DASHDBPASS) python2 test_notebook_ui.py
 	
 # run the sample notebooks, test the kernel
 test_notebooks:
