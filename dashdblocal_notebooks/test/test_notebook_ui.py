@@ -1,8 +1,10 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
 
 import sys, os, re, requests
 import unittest
-from urllib.parse import urljoin
+from urlparse import urljoin
+# python3
+#from urllib.parse import urljoin
 
 
 DASHDBHOST = os.environ.get('DASHDBHOST')

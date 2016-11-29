@@ -19,6 +19,11 @@ SHELL = /bin/bash
 SUBMIT_SCRIPT = output/spark-submit.sh
 
 CONTAINER_CFG := -e DASHDBHOST=$(DASHDBHOST) -e DASHDBUSER=$(DASHDBUSER) -e DASHDBPASS=$(DASHDBPASS)
+ifeq ($(DASHDBHOST), localhost)
+	CONTAINER_CFG += --net=host
+else
+	CONTAINER_CFG += -p 8888:8888
+endif
 
 all: image start test stop
 
@@ -32,8 +37,10 @@ start:
 	@echo -e '\n\n### Starting test container ###'
 	# cleanup old stuff
 	-docker rm -f $(CONTAINER_NAME)
+	# fix permissions if we are root
+	chmod -R a+rX .
 	# launch docker container
-	docker run -d -p 8888:8888 -v `pwd`:/test --name=$(CONTAINER_NAME) $(CONTAINER_CFG) $(IMAGE_NAME)
+	docker run -d -v `pwd`:/test --name=$(CONTAINER_NAME) $(CONTAINER_CFG) $(IMAGE_NAME)
 	# wait for the container to start, write container output to stderr so we can see it
 	@grep -m1 'The Jupyter Notebook is running' <(timeout 1m docker logs -f $(CONTAINER_NAME) 2>&1 | tee /dev/stderr)
 	@echo "Started notebook container $(CONTAINER_NAME)"
@@ -47,7 +54,7 @@ start_dev:
 	# cleanup old stuff
 	-docker rm -f $(CONTAINER_NAME)
 	# launch docker container
-	docker run -d -p 8888:8888 -v `pwd`:/test -v `pwd`/../src:/src --name=$(CONTAINER_NAME) $(CONTAINER_CFG) $(IMAGE_NAME)
+	docker run -d -v `pwd`:/test -v `pwd`/../src:/src --name=$(CONTAINER_NAME) $(CONTAINER_CFG) $(IMAGE_NAME)
 	# wait for the container to start, write container output to stderr so we can see it
 	@grep -m1 'The Jupyter Notebook is running' <(timeout 1m docker logs -f $(CONTAINER_NAME) 2>&1 | tee /dev/stderr)
 	@echo "Started notebook container $(CONTAINER_NAME)"
@@ -86,7 +93,7 @@ test_notebooks:
 # get spark-submit script from the dashDB server
 get_launcher:
 	curl -k -v -o $(SUBMIT_SCRIPT) -u $(DASHDBUSER):$(DASHDBPASS) $(DASHDBURL)/blushiftservices/userfiledownload.do?path=spark-submit.sh
-	chmod a+x $(SUBMIT_SCRIPT)
+	chmod a+rx $(SUBMIT_SCRIPT)
 	
 # test the bundlers. need the downloaded spark-submit script in the PATH
 test_bundlers:
