@@ -64,11 +64,13 @@ start_dev:
 	
 # stop and remove the test container
 # Note: simply killing the container with rm -f will not shut down running kernels in Spark
+# also shut down the Spark cluster to make sure we have no orphaned kernels left over
 stop:
 	@echo -e '\n\n### Cleaning up test container ###'
-	docker stop $(CONTAINER_NAME)
-	docker rm $(CONTAINER_NAME)
-
+	-docker stop $(CONTAINER_NAME)
+	-docker rm $(CONTAINER_NAME)
+	@echo -e '\n\n### Stopping Spark cluster for $(DASHDBUSER) ###'
+	curl -k -u $(DASHDBUSER):$(DASHDBPASS) -XPOST https://$(DASHDBHOST):8443/dashdb-api/analytics/public/cluster/deallocate
 
 test: test_container_logs test_notebook_ui test_notebooks get_launcher test_bundlers
 
@@ -92,10 +94,11 @@ test_notebooks:
 	
 # get spark-submit script from the dashDB server
 get_launcher:
-	curl -k -v -o $(SUBMIT_SCRIPT) -u $(DASHDBUSER):$(DASHDBPASS) $(DASHDBURL)/blushiftservices/userfiledownload.do?path=spark-submit.sh
+	curl -k -v -o $(SUBMIT_SCRIPT) -u $(DASHDBUSER):$(DASHDBPASS) https://$(DASHDBHOST):8443/blushiftservices/userfiledownload.do?path=spark-submit.sh
 	chmod a+rx $(SUBMIT_SCRIPT)
 	
 # test the bundlers. need the downloaded spark-submit script in the PATH
 test_bundlers:
 	@echo -e '\n\n### Checking notebook bundlers ###'
-	docker exec -ti $(CONTAINER_NAME) /bin/sh -c 'cd /test && export PATH=/test/output:$$PATH && python3 test_bundlers.py'
+	# add -ti here to see output more interactively and avoid buffering -- fails if started from Jenkins (no tty)
+	docker exec $(CONTAINER_NAME) /bin/sh -c 'cd /test && export PATH=/test/output:$$PATH && python3 test_bundlers.py'

@@ -14,3 +14,7 @@ libraryDependencies ++= {
         "org.apache.spark" %% "spark-mllib" % sparkVersion
     )
 }
+
+// avoid resolving all dependencies again after clean
+// with our small notebook project, this takes most of the build time
+cleanKeepFiles ++= Seq("resolution-cache", "streams").map(target.value / _)
