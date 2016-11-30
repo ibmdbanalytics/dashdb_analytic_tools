@@ -25,7 +25,9 @@ else
 	CONTAINER_CFG += -p 8888:8888
 endif
 
-all: image start test stop
+run-test: image
+	# run test in a sub-make because we want to clean up after a test failure
+	$(MAKE) start test; rc=$$?; $(MAKE) stop; exit $$rc
 
 # build the docker image
 image:
@@ -90,7 +92,7 @@ test_notebook_ui:
 test_notebooks:
 	@echo -e '\n\n### Checking kernel and sample notebook ###'
 	rm -rf output/notebooks && mkdir -p output/notebooks && chmod a+w output/notebooks
-	docker exec -ti $(CONTAINER_NAME) /test/test_notebooks.sh
+	docker exec $(CONTAINER_NAME) /test/test_notebooks.sh
 	
 # get spark-submit script from the dashDB server
 get_launcher:
