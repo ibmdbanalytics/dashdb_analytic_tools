@@ -33,8 +33,8 @@ def bundle(handler, absolute_notebook_path):
     handler.set_header('Content-Type', 'text/plain; charset=us-ascii ')
     handler.write("Building scala application...\n")
     handler.flush()
-    export_to_scalafile(absolute_notebook_path, SOURCEFILE)
-    jarfile = build_scala_project(handler, APPDIR, SOURCEFILE, notebook_filename)
+    deps = export_to_scalafile(absolute_notebook_path, SOURCEFILE)
+    jarfile = build_scala_project(handler, APPDIR, SOURCEFILE, notebook_filename, deps)
     if not jarfile: return
 
     upload = subprocess.run(["upload-sparkapp.py", jarfile],

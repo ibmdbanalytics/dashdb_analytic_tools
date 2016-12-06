@@ -1,7 +1,7 @@
 # (c) Copyright IBM Corporation 2016
 # LICENSE: BSD-3, https://opensource.org/licenses/BSD-3-Clause
 
-import warnings, os, io, glob, json, subprocess
+import warnings, os, io, glob, json, re, subprocess
 from nbconvert import TemplateExporter, preprocessors
 from jinja2 import FileSystemLoader
 from . import SPARKAPP_LOG
@@ -19,32 +19,44 @@ def export_to_scala(absolute_notebook_path):
         exporter = TemplateExporter(extra_loaders=[FileSystemLoader(INSTALLDIR)],
                                     preprocessors=[ScalaAppPreprocessor])
         exporter.template_file = 'scala_sparkapp'
-        (body, resources) = exporter.from_file(absolute_notebook_path)
-        return body
+        return exporter.from_file(absolute_notebook_path)
 
 
 def export_to_scalafile(absolute_notebook_path, scala_source):
-    '''convert the notebook source to scala and save it into the given filename'''
+    '''
+    convert the notebook source to scala and save it into the given filename.
+    return a list of maven/sbt dependencies defined via %AddDeps in the notebook
+    '''
 
     SPARKAPP_LOG.info("Exporting noteboook to %s", scala_source)
-    scalacode = export_to_scala(absolute_notebook_path)
+    (scalacode, resources) = export_to_scala(absolute_notebook_path)
     with open(scala_source, 'wt') as sourcefile:
         sourcefile.write(scalacode)
+    return resources['mvn_deps']
 
+def format_dependency(dep):
+    quoted_components = map(lambda x: '"{0}"'.format(x), dep.split())
+    return " % ".join(quoted_components) + ",\n"
 
-def build_scala_project(handler, project_dir, scalafile, appname):
+def build_scala_project(handler, project_dir, scalafile, appname, dependencies = []):
     '''build the given scala project, replacing the <appname> tag in build.sbt.template
     with the given application name.
     If the build fails, display the build output via the given tornado handler.
     Return the name of the generated JAR'''
 
-    SPARKAPP_LOG.info("Building scala application in %s...", project_dir)
+    dependencyString = ""
+    for dep in dependencies:
+        dependencyString += format_dependency(dep)
+    SPARKAPP_LOG.info("Building scala application in %s with dependencies %s", 
+                      project_dir, dependencyString)
     with open(project_dir+"/../build.sbt.template", "rt") as buildfile_in:
         with open(project_dir+"/build.sbt", "wt") as buildfile_out:
             for line in buildfile_in:
-                buildfile_out.write(line.replace('<appname>', appname))
+                buildfile_out.write(line
+                                    .replace('<appname>', appname)
+                                    .replace('// <dependencies>', dependencyString))
     build = subprocess.run(["./build.sh"], cwd=project_dir,
-                           stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                           stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     if (build.returncode != 0):
         show_build_error(handler, build.stdout, scalafile)
         return None
@@ -105,13 +117,26 @@ def add_launcher_scripts(project_dir, jarfile, appname):
 
 
 class ScalaAppPreprocessor(preprocessors.Preprocessor):
-    """A preprocessor to remove some of the cells of a notebook"""
+    """A preprocessor to handle Spark/Scala applications written as notebooks"""
 
     def keepCell(self, cell):
-        # filter out cells marked by the user and cell magics
+        """filter out cells marked by the user and cell magics"""
         return (not cell.source.startswith(FILTER_CELL_MARKER)
             and not cell.source.startswith('%%'))
 
+    def processCode(self, source, resources):
+        """filter out line magics. collect maven dependencies from %AddDeps into the notebook resources"""
+        def repl(match):
+            if (match.group(1) == "AddDeps"):
+                resources.setdefault('mvn_deps', []).append(match.group(2))
+            return ""
+        return re.sub(r"^%([^\s]+)\s*(.*?)$", repl, source, 0, re.MULTILINE)
+        
+    def processCell(self, cell, resources):
+        if (cell.cell_type == 'code'):
+            cell.source = self.processCode(cell.source, resources)
+        return cell
+
     def preprocess(self, nb, resources):
-        nb.cells = filter(self.keepCell, nb.cells)
+        nb.cells = [self.processCell(cell, resources) for cell in nb.cells if self.keepCell(cell)]
         return nb, resources

@@ -8,7 +8,8 @@ import unittest.mock as mock
 import jupyter_cms_sparkapp.sparkapp_upload as upload
 
 
-TEST_NOTEBOOK = "/home/jovyan/work/Spark_KMeansSample.ipynb"
+TEST_NOTEBOOK = "/test/TestNotebook.ipynb"
+#TEST_NOTEBOOK = "/home/jovyan/work/Spark_KMeansSample.ipynb"
 
 class TestSparkappBundler(unittest.TestCase):
 
@@ -30,7 +31,7 @@ class TestSparkappBundler(unittest.TestCase):
         handler.write = self.handlerWrite
 
         submit_commands = upload.bundle(handler, TEST_NOTEBOOK).result()
-        self.assertIn("Successfully uploaded spark_kmeanssample", self.handler_output)
+        self.assertIn("Successfully uploaded testnotebook", self.handler_output)
         self.assertIn("spark-submit", submit_commands[-1])
         
         submit_line = " && ".join(submit_commands)
