@@ -9,12 +9,15 @@ libraryDependencies ++= {
     val sparkVersion =  "2.0.1"
     Seq(
         // <dependencies>
-        "org.apache.spark" %% "spark-core" % sparkVersion,
-        "org.apache.spark" %% "spark-sql" % sparkVersion,
-        "org.apache.spark" %% "spark-repl" % sparkVersion,
-        "org.apache.spark" %% "spark-mllib" % sparkVersion
+        "org.apache.spark" %% "spark-core" % sparkVersion % "provided",
+        "org.apache.spark" %% "spark-sql" % sparkVersion % "provided",
+        "org.apache.spark" %% "spark-repl" % sparkVersion % "provided",
+        "org.apache.spark" %% "spark-mllib" % sparkVersion % "provided"
     )
 }
+
+// don't include Scala runtime libs in assembly; they are provided by Spark
+assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false)
 
 // avoid resolving all dependencies again after clean
 // with our small notebook project, this takes most of the build time

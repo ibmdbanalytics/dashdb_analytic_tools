@@ -126,11 +126,17 @@ class ScalaAppPreprocessor(preprocessors.Preprocessor):
 
     def processCode(self, source, resources):
         """filter out line magics. collect maven dependencies from %AddDeps into the notebook resources"""
-        def repl(match):
-            if (match.group(1) == "AddDeps"):
-                resources.setdefault('mvn_deps', []).append(match.group(2))
-            return ""
-        return re.sub(r"^%([^\s]+)\s*(.*?)$", repl, source, 0, re.MULTILINE)
+        # process %AddDeps and add to resources
+        for match in re.finditer(r"^(//)?%AddDeps\s+(.+?)$", source, re.MULTILINE):
+            dep = match.group(2)
+            if (match.group(1) == "//"):
+                # treat dependencies that are commented out as "provided" deps, which
+                # will be used for compile but not added into the .jar assembly
+                # this is for deps that are pre-installed in dashDB via globallibs etc.
+                dep += " provided"
+            resources.setdefault('mvn_deps', []).append(dep)
+        # comment all line magics 
+        return re.sub(r"^(%.*?)$", r"//\1", source, 0, re.MULTILINE)
         
     def processCell(self, cell, resources):
         if (cell.cell_type == 'code'):

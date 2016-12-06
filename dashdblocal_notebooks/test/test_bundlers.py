@@ -31,7 +31,7 @@ class TestSparkappBundler(unittest.TestCase):
         handler.write = self.handlerWrite
 
         submit_commands = upload.bundle(handler, TEST_NOTEBOOK).result()
-        self.assertIn("Successfully uploaded testnotebook", self.handler_output)
+        self.assertIn("Successfully uploaded TestNotebook", self.handler_output)
         self.assertIn("spark-submit", submit_commands[-1])
         
         submit_line = " && ".join(submit_commands)

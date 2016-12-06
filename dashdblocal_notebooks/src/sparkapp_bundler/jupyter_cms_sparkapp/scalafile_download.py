@@ -15,8 +15,10 @@ def bundle(handler, absolute_notebook_path):
     '''
 
     notebook_filename = os.path.splitext(os.path.basename(absolute_notebook_path))[0]
-    scalacode = export_to_scala(absolute_notebook_path)
+    (scalacode, resources) = export_to_scala(absolute_notebook_path)
 
     handler.set_header('Content-Type', 'text/plain; charset=us-ascii ')
+    for dep in resources['mvn_deps'] or []:
+        handler.write("// requires {0}\n".format(dep))
     handler.write(scalacode)
     handler.finish()
