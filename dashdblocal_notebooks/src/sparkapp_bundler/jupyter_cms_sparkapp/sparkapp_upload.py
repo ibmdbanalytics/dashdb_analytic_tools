@@ -26,15 +26,13 @@ def bundle(handler, absolute_notebook_path):
     :param absolute_notebook_path: The path of the notebook on disk
     '''
 
-    #TEMPORARY hardcode path for development
-    #absolute_notebook_path = '/home/jovyan/work/Spark_KMeansSample.ipynb'
     notebook_filename = os.path.splitext(os.path.basename(absolute_notebook_path))[0]
 
     handler.set_header('Content-Type', 'text/plain; charset=us-ascii ')
     handler.write("Building scala application...\n")
     handler.flush()
-    export_to_scalafile(absolute_notebook_path, SOURCEFILE)
-    jarfile = build_scala_project(handler, APPDIR, SOURCEFILE, notebook_filename)
+    deps = export_to_scalafile(absolute_notebook_path, SOURCEFILE)
+    jarfile = build_scala_project(handler, APPDIR, SOURCEFILE, notebook_filename, deps)
     if not jarfile: return
 
     upload = subprocess.run(["upload-sparkapp.py", jarfile],
@@ -59,6 +57,7 @@ def bundle(handler, absolute_notebook_path):
     handler.write("- Submit via dashDB's spark-submit.sh command line tool. Run the following sequence of commands:\n\n")
     for cmd in submit_commands:
         handler.write("  {0}\n".format(cmd))
+    handler.write("\n")
     handler.write("- Submit via dashDB's REST API, e.g using cURL: Set the shell variable DASHDBPASS to the dashDB password for {1}\n"
                   "  and run the following command:\n\n"
                   "curl -k -u {1}:$DASHDBPASS -XPOST https://{0}:8443/dashdb-api/analytics/public/apps/submit \\\n"

@@ -24,8 +24,8 @@ def bundle(handler, absolute_notebook_path):
 
     notebook_filename = os.path.splitext(os.path.basename(absolute_notebook_path))[0]
 
-    export_to_scalafile(absolute_notebook_path, SOURCEFILE)
-    jarfile = build_scala_project(handler, APPDIR, SOURCEFILE, notebook_filename)
+    deps = export_to_scalafile(absolute_notebook_path, SOURCEFILE)
+    jarfile = build_scala_project(handler, APPDIR, SOURCEFILE, notebook_filename, deps)
     if not jarfile: return
 
     relpath = os.path.relpath(jarfile, APPDIR)
