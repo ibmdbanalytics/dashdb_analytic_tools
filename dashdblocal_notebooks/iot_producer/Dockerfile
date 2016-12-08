@@ -20,5 +20,7 @@ COPY start.sh /usr/local/bin
 ENV JAVA_HOME=/etc/alternatives/jre
 ENV PATH=$PATH:$JAVA_HOME/bin:/producer/kafka/bin
 
+RUN chmod +x /usr/local/bin/start.sh
+
 ENTRYPOINT ["start.sh"]
 CMD ["1000"]
