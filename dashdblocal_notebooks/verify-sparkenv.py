@@ -11,7 +11,7 @@ import json, requests
 from requests.auth import HTTPBasicAuth
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
-MINUMUM_BUILD_NUMBER = '141'
+MINUMUM_BUILD_NUMBER = '140'
 MINUMUM_DASHDB_LEVEL = '1.4.0'
 
 def verify_sparkenv():
