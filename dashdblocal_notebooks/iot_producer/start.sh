@@ -1,4 +1,7 @@
 #!/bin/bash
+# A little script that starts up the Kafka environment, creates a topic 'iot4dashdb'
+# and feeds some randomly generated sample data into the topic using the Kafka
+# command-line producer scipt
 
 if [ "$#" -ne 1 ] && [ "$#" -ne 5 ]; then
     echo "Illegal number of parameters"
@@ -36,23 +39,20 @@ COUNTER="$1"
 
 if [ "$#" -ge 2 ]; then
     ID="$2"
-        POWER_LVL="$3"
-        NOISE="$4"
-        TEMP_MIN="$5"
+    POWER_LVL="$3"
+    NOISE="$4"
+    TEMP_MIN="$5"
 fi
 
 while [  $COUNTER -ge 1 ]; do
 
-    let COUNTER=COUNTER-1
-    let DEV_ID=$ID+$RANDOM%10
+    COUNTER=COUNTER-1
+    DEV_ID=$ID+$RANDOM%10
     TS=`date +"%F %T"`
-        let TEMP=$TEMP_MIN+$RANDOM%$TEMP_RANGE
-        let POWER=$POWER_LVL+$RANDOM%10
-
+    TEMP=$TEMP_MIN+$RANDOM%$TEMP_RANGE
+    POWER=$POWER_LVL+$RANDOM%10
 
     JSON="{\"payload\": {\"temperature\": $TEMP,\"tempOutside\": $TEMP_OUT,\"powerProd\": $POWER,\"noiseLevel1\": $NOISE,\"time\":\"$TS\"},\"deviceId\": \"$DEV_ID\",\"deviceType\": \"$DEV_TYPE\",\"eventType\": \"status\"}"
-
-#    echo $JSON
     echo $JSON | kafka/bin/kafka-console-producer.sh --broker-list localhost:9092 --topic iot4dashdb
 
     sleep $SLEEPS

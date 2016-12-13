@@ -8,10 +8,15 @@ RUN yum install -y \
 
 WORKDIR /producer
 
-RUN curl -S http://www-eu.apache.org/dist/zookeeper/zookeeper-3.4.8/zookeeper-3.4.8.tar.gz | tar -xz \
+ENV ZOOKEEPER_VERSION 3.4.8
+ENV KAFKA_VERSION 0.10.1.0
+
+# get zookeeper and unpack
+RUN curl -S http://www-eu.apache.org/dist/zookeeper/zookeeper-${ZOOKEEPER_VERSION}/zookeeper-${ZOOKEEPER_VERSION}.tar.gz | tar -xz \
   && ln -s zookeeper-* zookeeper
 
-RUN curl -S http://www-eu.apache.org/dist/kafka/0.10.1.0/kafka_2.11-0.10.1.0.tgz | tar -xz \
+# get kafka and unpack
+RUN curl -S http://www-eu.apache.org/dist/kafka/${KAFKA_VERSION}/kafka_2.11-${KAFKA_VERSION}.tgz | tar -xz \
   && ln -s kafka_* kafka
 
 COPY zoo.cfg zookeeper/conf
@@ -20,7 +25,7 @@ COPY start.sh /usr/local/bin
 ENV JAVA_HOME=/etc/alternatives/jre
 ENV PATH=$PATH:$JAVA_HOME/bin:/producer/kafka/bin
 
-RUN chmod +x /usr/local/bin/start.sh
+RUN chmod a+rx /usr/local/bin/start.sh
 
 ENTRYPOINT ["start.sh"]
 CMD ["1000"]
