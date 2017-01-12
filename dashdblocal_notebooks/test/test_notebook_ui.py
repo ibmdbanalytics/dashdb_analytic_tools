@@ -1,4 +1,6 @@
 #!/usr/bin/env python2
+# (c) Copyright IBM Corporation 2016
+# LICENSE: BSD-3, https://opensource.org/licenses/BSD-3-Clause
 
 import sys, os, re, requests
 import unittest
@@ -33,7 +35,8 @@ class TestNotebookUI(unittest.TestCase):
         login_url = urljoin(resp.url, match.group(1))
         login_params = { 'password': DASHDBPASS }
         resp = self.sess.post(login_url, data=login_params)
-        self.assertIn('<button id="logout"', resp.text)
+        # can't test much more from a python client :-(
+        self.assertIn('Notebook requires JavaScript', resp.text)
 
 if __name__ == '__main__':
     unittest.main()

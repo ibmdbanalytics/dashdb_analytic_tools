@@ -1,4 +1,6 @@
 #!/bin/sh
+# (c) Copyright IBM Corporation 2016
+# LICENSE: BSD-3, https://opensource.org/licenses/BSD-3-Clause
 
 NBCONVERT_OPTIONS="--to=markdown --ExecutePreprocessor.enabled=True"
 #NBCONVERT_OPTIONS="--to=markdown --ExecutePreprocessor.enabled=True --Application.log_level=DEBUG"
