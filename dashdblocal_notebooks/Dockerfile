@@ -3,12 +3,21 @@
 
 # Jupyter notebook server for connecting to dashDB local Spark
 
+# To build on Power instead of x86
+# - manually build the base image from https://github.com/jupyter/docker-stacks/tree/master/base-notebook
+#   using Dockerfile.ppc64
+# - change the FROM clause below to specify your base image
+# - remove the first RUN statement updating sources.list
+
 FROM jupyter/base-notebook@sha256:5d2090dfb04036ec32c8c4632bb0368ffcb9a304f98e811a6386ef1c9ad010bf
 USER root
 
+# Following line is needed to install OpenJDK with the debian base of jupyter/base-notebook
+# remove for Power builds (ubuntu-based)
+RUN echo "deb http://cdn-fastly.deb.debian.org/debian jessie-proposed-updates main" >> /etc/apt/sources.list
+
 # sort packages alphabetically following docker convention
-RUN echo "deb http://cdn-fastly.deb.debian.org/debian jessie-proposed-updates main" >> /etc/apt/sources.list \
-    && apt-get update \
+RUN apt-get update \
     && apt-get install -y --no-install-recommends \
        curl \
        default-jre-headless \
