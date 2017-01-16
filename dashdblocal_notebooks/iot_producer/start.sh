@@ -1,4 +1,7 @@
 #!/bin/bash
+# (c) Copyright IBM Corporation 2016
+# LICENSE: BSD-3, https://opensource.org/licenses/BSD-3-Clause
+
 # A little script that starts up the Kafka environment, creates a topic 'iot4dashdb'
 # and feeds some randomly generated sample data into the topic using the Kafka
 # command-line producer scipt

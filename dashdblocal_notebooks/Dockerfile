@@ -1,20 +1,23 @@
 # (c) Copyright IBM Corporation 2016
 # LICENSE: BSD-3, https://opensource.org/licenses/BSD-3-Clause
 
-FROM jupyter/base-notebook
-# tested with version:
-# FROM jupyter/base-notebook:c411f52fcc93
+# Jupyter notebook server for connecting to dashDB local Spark
+
+FROM jupyter/base-notebook@sha256:5d2090dfb04036ec32c8c4632bb0368ffcb9a304f98e811a6386ef1c9ad010bf
 USER root
 
 # sort packages alphabetically following docker convention
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    curl \
-    default-jre-headless \
-    unzip \
-    zip
+RUN echo "deb http://cdn-fastly.deb.debian.org/debian jessie-proposed-updates main" >> /etc/apt/sources.list \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+       curl \
+       default-jre-headless \
+       unzip \
+       zip \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# sbt is not in repo for Trusty
+# sbt is not in apt repo
 RUN cd /tmp && \
 	wget -nv https://bintray.com/artifact/download/sbt/debian/sbt-0.13.11.deb && \
 	dpkg -i sbt-0.13.11.deb && \
@@ -74,6 +77,9 @@ RUN bash -c "mkdir -p $PROJECTS_DIR/sparkapp/src/main/{java,scala,resources}" &&
 RUN pip install /src/sparkapp_bundler && \
 	jupyter serverextension enable --py jupyter_cms_sparkapp --sys-prefix && \
 	jupyter bundler enable --py jupyter_cms_sparkapp --sys-prefix
+
+# set DASHDBPASS as notebook login password
+RUN echo "from IPython.lib import passwd\nc.NotebookApp.password = passwd(os.environ['DASHDBPASS'])" >> ~/.jupyter/jupyter_notebook_config.py
 
 
 # put our setup on top of the base image startup script

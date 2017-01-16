@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# (c) Copyright IBM Corporation 2016
+# LICENSE: BSD-3, https://opensource.org/licenses/BSD-3-Clause
 
 import sys, subprocess
 import tornado.web

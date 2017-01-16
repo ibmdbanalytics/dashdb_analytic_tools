@@ -1,3 +1,8 @@
+# (c) Copyright IBM Corporation 2016
+# LICENSE: BSD-3, https://opensource.org/licenses/BSD-3-Clause
+
+# Sample kafka setup with a producer simulating IoT data from a wind turbine
+
 FROM centos:7
 ## This handle reaches Torsten
 MAINTAINER "Torsten Steinbach" torsten@de.ibm.com
