@@ -18,6 +18,8 @@ IMAGE_NAME = dashdblocal_notebook:dev
 SHELL = /bin/bash
 SUBMIT_SCRIPT = output/spark-submit.sh
 
+ARCH := $(shell uname -m)
+
 CONTAINER_CFG := -e DASHDBHOST=$(DASHDBHOST) -e DASHDBUSER=$(DASHDBUSER) -e DASHDBPASS=$(DASHDBPASS)
 ifeq ($(DASHDBHOST), localhost)
 	CONTAINER_CFG += --net=host
@@ -29,17 +31,28 @@ run-test: image
 	# run test in a sub-make because we want to clean up after a test failure
 	$(MAKE) start test; rc=$$?; $(MAKE) stop; exit $$rc
 
-# build the docker image
-image:
-	@echo -e '\n\n### Building docker image ###'
-	docker build -t $(IMAGE_NAME) ..
-	
+image: Dockerfile.$(ARCH)
+	@echo -e '\n\n### Building docker image for $ARCH###'
+	docker build -t $(IMAGE_NAME) -f Dockerfile.$(ARCH) ..
+
+
+# Default Dockerfile is for Intel, just copy
+Dockerfile.x86_64: ../Dockerfile
+	cp $< $@
+
+# Patch Dockerfile for Power
+# - patch FROM line Assuming that a local base-notebook image exists
+# - comment "RUN echo ... /etc/apt/sources.list" command
+Dockerfile.ppc64le: ../Dockerfile
+	sed 's/FROM/FROM base-notebook\n#FROM/; s!\(RUN echo .* /etc/apt/sources.list\)!#\1!' < $< > $@
+
 # start the test container
 start:
 	@echo -e '\n\n### Starting test container ###'
 	# cleanup old stuff
 	-docker rm -f $(CONTAINER_NAME)
 	# fix permissions if we are root
+	rm -rf output && mkdir -p output
 	chmod -R a+rX .
 	# launch docker container
 	docker run -d -v `pwd`:/test --name=$(CONTAINER_NAME) $(CONTAINER_CFG) $(IMAGE_NAME)
@@ -91,7 +104,7 @@ test_notebook_ui:
 # run the sample notebooks, test the kernel
 test_notebooks:
 	@echo -e '\n\n### Checking kernel and sample notebook ###'
-	rm -rf output/notebooks && mkdir -p output/notebooks && chmod a+w output/notebooks
+	rm -rf output/notebooks && mkdir -p output/notebooks && chmod a+rwx output/notebooks
 	docker exec $(CONTAINER_NAME) /test/test_notebooks.sh
 	
 # get spark-submit script from the dashDB server
