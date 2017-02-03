@@ -64,7 +64,10 @@ COPY build.sbt.template build.sh $PROJECTS_DIR/
 COPY plugins.sbt $PROJECTS_DIR/sparkapp/project/
 COPY kernel-scala.json /home/$NB_USER/.local/share/jupyter/kernels/idax-scala/kernel.json
 COPY kernel-python.json /home/$NB_USER/.local/share/jupyter/kernels/idax-python/kernel.json
-COPY verify-sparkenv.py upload-sparkapp.py patch-ui.py run-toree.py launch-with-idax.sh /usr/local/bin/
+COPY kernel-ipython.json /home/$NB_USER/.local/share/jupyter/kernels/idax-ipython/kernel.json
+COPY verify-sparkenv.py upload-sparkapp.py patch-ui.py run-kernel-in-dashdb.py \
+	ipython-launcher.py startup-ipython-notebook.py launch-with-idax.sh \
+	/usr/local/bin/
 COPY Spark_KMeansSample.ipynb Tornado_Clustering.ipynb ./
 
 # copy jupyter CMS extensions

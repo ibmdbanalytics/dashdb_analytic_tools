@@ -26,21 +26,16 @@ def upload_conn_info(conn_file_name, conn_file_content):
 
 
 # start toree server on dashDB local
-def start_kernel(toree_args):
+def start_kernel(request_data):
 	global submissionid
-	req_data = {
-		'appArgs' : toree_args,
-		'appResource' : 'toree.jar',
-		'mainClass' : 'org.apache.toree.Main'
-	}
 	resp = session.post("https://{0}:8443/dashdb-api/analytics/public/apps/submit".format(DASHDBHOST),
-		json=req_data, auth=auth, verify=False)
+		json=request_data, auth=auth, verify=False)
 
 	if (resp.status_code != requests.codes.ok):
-		sys.exit ("Failed to submit Spark kernel job: " + resp.text)
+		sys.exit ("Failed to submit Spark kernel job: code {0}, {1}".format(resp.status_code, resp.text))
 	resp_data = resp.json()
 	if (resp_data.get('status') != 'submitted'):
-		sys.exit ("Failed to submit Spark kernel job: " + resp.text)
+		sys.exit ("Failed to submit Spark kernel job: {0}".format(resp.text))
 
 	submissionid = resp_data['submissionId']
 	print("Started Spark kernel with submission id " + submissionid)
@@ -129,12 +124,15 @@ def forward_connection(source, destination, id):
 
 
 if __name__ == "__main__":
-	if(len(sys.argv) < 2): sys.exit("Expecting connection file name as first argument")
+	if(len(sys.argv) < 3): 
+		sys.exit("Syntax: run-kernel-in-dashdb.py <kernel_type> <connection_file> <extra_kernel_args...>")
 
-	# comm file is first argument
-	conn_file_in = sys.argv[1]
-	# extra arguments are passed on to toree kernel
-	extra_args = sys.argv[2:]
+	# kernel type is first argument
+	kernel_type = sys.argv[1]
+	# comm file is second argument
+	conn_file_in = sys.argv[2]
+	# extra arguments are passed on to the kernel
+	extra_kernel_args = sys.argv[3:]
 	
 	DASHDBHOST = os.environ.get('DASHDBHOST') or 'localhost'
 	DASHDBUSER = os.environ.get('DASHDBUSER')
@@ -161,10 +159,23 @@ if __name__ == "__main__":
 	with open(conn_file_in, 'r') as f:
 		conn_file_content = json.loads(f.read())
 	upload_conn_info(conn_file_name, conn_file_content)
-	
-	toree_args = [ '--profile', conn_file_out ] + extra_args
-	print("Starting Spark kernel with arguments " + str(toree_args))
-	start_kernel(toree_args)
+
+	if (kernel_type == 'toree'):
+		request_data = {
+			'appArgs' : [ '--profile', conn_file_out ] + extra_kernel_args,
+			'appResource' : 'toree.jar',
+			'mainClass' : 'org.apache.toree.Main'
+		}
+	elif (kernel_type == 'ipython'):
+		request_data = {
+			'appArgs' : [ '-f', conn_file_out ] + extra_kernel_args,
+			'appResource' : 'ipython-launcher.py'
+		}
+	else:
+		sys.exit("Invalid kernel type" + kernel_type)
+
+	print("Starting Spark kernel with " + str(request_data))
+	start_kernel(request_data)
 	
 	if (IS_REMOTE_KERNEL):
 		forward_ports(conn_file_content)

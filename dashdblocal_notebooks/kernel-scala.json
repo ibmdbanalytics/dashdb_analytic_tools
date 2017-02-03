@@ -1,8 +1,9 @@
 {
-  "display_name": "IDAX - Scala",
+  "display_name": "Spark Scala - Toree",
   "language": "scala",
   "argv": [
-    "/usr/local/bin/run-toree.py",
+    "/usr/local/bin/run-kernel-in-dashdb.py",
+    "toree",
     "{connection_file}"
   ]
 }
