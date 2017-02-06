@@ -59,21 +59,15 @@ USER root
 ENV PROJECTS_DIR /home/$NB_USER/projects
 
 # copy other files late in the build to avoid cache busting
-COPY toree-assembly-0.2.0.dev1-incubating-SNAPSHOT.jar /home/$NB_USER/resources/toree.jar
-COPY ipython-installer.py ipython-launcher.py startup-ipython-notebook.py \
-	/home/$NB_USER/resources/
+COPY bin/* /usr/local/bin/
+COPY resources/* /home/$NB_USER/resources/
+COPY jupyter /home/$NB_USER/.local/share/jupyter/
+COPY *.ipynb ./
 COPY build.sbt.template build.sh $PROJECTS_DIR/
 COPY plugins.sbt $PROJECTS_DIR/sparkapp/project/
-COPY kernel-scala.json /home/$NB_USER/.local/share/jupyter/kernels/idax-scala/kernel.json
-COPY kernel-python.json /home/$NB_USER/.local/share/jupyter/kernels/idax-python/kernel.json
-COPY kernel-ipython.json /home/$NB_USER/.local/share/jupyter/kernels/idax-ipython/kernel.json
-COPY verify-sparkenv.py upload-sparkapp.py verify-ipython-in-dashdb.py \
-	patch-ui.py run-kernel-in-dashdb.py launch-with-idax.sh \
-	/usr/local/bin/
-COPY Spark_KMeansSample.ipynb Tornado_Clustering.ipynb ./
 
 # copy jupyter CMS extensions
-ADD src /src
+COPY src /src
 
 # fix permissions if git repo was checked out as root
 # fix ownership for all files copied into homedir
