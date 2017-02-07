@@ -1,0 +1,1 @@
+Scripts that go into the /usr/local/bin directory of the image

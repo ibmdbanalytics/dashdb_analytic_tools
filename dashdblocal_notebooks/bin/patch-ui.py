@@ -16,7 +16,7 @@ if os.path.isfile(PATCH_BAK):
 else:
 	DASHDBHOST = os.environ.get('DASHDBHOST') or 'localhost'
 	DASHDBUSER = os.environ.get('DASHDBUSER')
-	if(DASHDBHOST == 'localhost' or DASHDBHOST =='127.0.0.1'): DASHDBHOST = socket.getfqdn()
+	if (DASHDBHOST == 'localhost' or DASHDBHOST =='127.0.0.1'): DASHDBHOST = socket.getfqdn()
 	if (not DASHDBUSER): sys.exit("DASHDBUSER variable must be defined")
 	dashdb_header_line = ('  <div id="dashdb-header" class="container">Notebook server for {0}@{1}</div>\n'
 						.format(DASHDBUSER, DASHDBHOST))

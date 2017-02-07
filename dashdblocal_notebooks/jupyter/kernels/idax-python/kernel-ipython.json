@@ -1,0 +1,10 @@
+{
+  "display_name": "Spark IPython",
+  "language": "python",
+  "argv": [
+    "/usr/local/bin/run-kernel-in-dashdb.py",
+    "ipython",
+    "{connection_file}",
+    "--InteractiveShellApp.exec_files=['spark/apps/startup-ipython-notebook.py']"
+  ]
+}

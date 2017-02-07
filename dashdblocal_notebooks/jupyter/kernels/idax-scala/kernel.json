@@ -1,0 +1,9 @@
+{
+  "display_name": "Spark Scala - Toree",
+  "language": "scala",
+  "argv": [
+    "/usr/local/bin/run-kernel-in-dashdb.py",
+    "toree",
+    "{connection_file}"
+  ]
+}

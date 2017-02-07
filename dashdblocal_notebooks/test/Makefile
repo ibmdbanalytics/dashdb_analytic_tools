@@ -73,9 +73,14 @@ start_dev:
 	# wait for the container to start, write container output to stderr so we can see it
 	@grep -m1 'The Jupyter Notebook is running' <(timeout 1m docker logs -f $(CONTAINER_NAME) 2>&1 | tee /dev/stderr)
 	@echo "Started notebook container $(CONTAINER_NAME)"
-	#
 	docker exec $(CONTAINER_NAME) pip install -e /src/sparkapp_bundler
 	
+start_interactive:
+	@echo '\n\n### Starting interactive container for development environment ###'
+	# cleanup old stuff
+	-docker rm -f $(CONTAINER_NAME)
+	# launch docker container
+	docker run -it --rm --entrypoint=bash -v `pwd`:/test -v `pwd`/../src:/src --name=$(CONTAINER_NAME) $(CONTAINER_CFG) $(IMAGE_NAME)
 	
 # stop and remove the test container
 # Note: simply killing the container with rm -f will not shut down running kernels in Spark
