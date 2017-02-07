@@ -10,7 +10,7 @@ WORKDIR=/test/output/notebooks
 # nvbconvert always writes to the same directory where the notebooks are located
 # so copy them to the test directory
 mkdir -p $WORKDIR
-cp *.ipynb $WORKDIR
+cp /test/*.ipynb $WORKDIR
 
 # run nbconvert to execute the notebooks with the Spark kernel in headless mode
 for notebook in $WORKDIR/*.ipynb; do
