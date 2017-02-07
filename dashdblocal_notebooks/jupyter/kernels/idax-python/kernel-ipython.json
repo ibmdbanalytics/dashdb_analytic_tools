@@ -5,6 +5,6 @@
     "/usr/local/bin/run-kernel-in-dashdb.py",
     "ipython",
     "{connection_file}",
-    "--InteractiveShellApp.exec_files=['spark/apps/startup.py']"
+    "--InteractiveShellApp.exec_files=['spark/apps/startup-ipython-notebook.py']"
   ]
 }

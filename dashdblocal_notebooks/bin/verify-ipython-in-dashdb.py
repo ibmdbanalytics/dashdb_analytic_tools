@@ -44,7 +44,7 @@ if __name__ == "__main__":
 	warnings.filterwarnings('ignore', category=InsecureRequestWarning)
 	
 	try:
-		print("Verifying IPython installation on {0}".format(DASHDBHOST))
+		print("Verifying IPython installation on {0}. This may take some time on the first attempt...".format(DASHDBHOST))
 		session = requests.Session()
 		message = run_installer();
 		if ("IPython installed" in message):
