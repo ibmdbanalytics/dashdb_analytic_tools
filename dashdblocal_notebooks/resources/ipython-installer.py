@@ -10,17 +10,17 @@ import sys
 # directly to the caller of the dashDB Spark REST API
 # So we're disguising our success messages as exceptions...
 class Success(Exception):
-	def __init__(self, msg):
-		self.msg = msg
-	def __str__(self):
-		return self.msg
+    def __init__(self, msg):
+        self.msg = msg
+    def __str__(self):
+        return self.msg
 
 try:
-	import ipykernel
-	raise Success("IPython available at {0}\n".format(ipykernel.__file__))
+    import ipykernel
+    raise Success("IPython available at {0}\n".format(ipykernel.__file__))
 except ImportError:
-	print("IPython not found, trying to install...\n")
-	import pip, os
-	pip.main(['install', "--user", "ipykernel"])
-	print("...successfully installed\n")
-	raise Success("IPython installed as {0}".format(os.environ.get("USER")))
+    print("IPython not found, trying to install...\n")
+    import pip, os
+    pip.main(['install', "--user", "ipykernel"])
+    print("...successfully installed\n")
+    raise Success("IPython installed as {0}".format(os.environ.get("USER")))

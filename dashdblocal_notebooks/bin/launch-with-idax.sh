@@ -19,9 +19,12 @@ PYTHON_KERNEL=kernel-ipython
 if [ -n "$PYSPARK_OVER_TOREE" ]; then
     echo "Toree selected for Python notebooks; some Python notebook functions are limited"
     PYTHON_KERNEL=kernel-toree
-elif ! verify-ipython-in-dashdb.py; then
-    echo "Warning: No IPython available in dashDB; some Python notebook functions are limited"
-    PYTHON_KERNEL=kernel-toree
+else
+    echo "Checking IPython availablility. This may take some time on the first attempt..."
+    if ! verify-ipython-in-dashdb.py; then
+        echo "Warning: No IPython available in dashDB; some Python notebook functions are limited"
+        PYTHON_KERNEL=kernel-toree
+    fi
 fi
 # overwrite kernel.json to use toree instead of ipython
 cp $HOME/.local/share/jupyter/kernels/idax-python/$PYTHON_KERNEL.json $HOME/.local/share/jupyter/kernels/idax-python/kernel.json

@@ -6,10 +6,10 @@
 # via the dashDB Spark REST interface
 
 def _notebook_init():
-	from ipykernel import kernelapp
+    from ipykernel import kernelapp
 
-	print("Starting IPython kernel")
-	kernelapp.launch_new_instance()
+    print("Starting IPython kernel")
+    kernelapp.launch_new_instance()
 
 _notebook_init()
 
