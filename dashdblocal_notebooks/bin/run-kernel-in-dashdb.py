@@ -25,7 +25,7 @@ def upload_conn_info(conn_file_name, conn_file_content):
     print("Upload complete: " + resp.text)
 
 
-# start toree server on dashDB local
+# start kernel app on dashDB local
 def start_kernel(request_data):
     global submissionid
     resp = session.post("https://{0}:8443/dashdb-api/analytics/public/apps/submit".format(DASHDBHOST),
@@ -42,7 +42,7 @@ def start_kernel(request_data):
     print(resp.text)
 
 
-# poll toree server status and wait for termination
+# poll kernel app status and wait for termination
 def monitor_kernel():
     global submissionid
     i = 0
@@ -60,7 +60,7 @@ def monitor_kernel():
     submissionid = None
 
 
-# explicitly request to shut down the toree server
+# explicitly request to shut down the kernel app
 def stop_kernel():
     global submissionid
     print("Shutting down")
@@ -165,11 +165,13 @@ if __name__ == "__main__":
             'appArgs' : [ '--profile', conn_file_out ] + extra_kernel_args,
             'appResource' : 'toree.jar',
             'mainClass' : 'org.apache.toree.Main'
+            # Providing an app name here is no use, because Toree will override the app name at execution
         }
     elif (kernel_type == 'ipython'):
         request_data = {
             'appArgs' : [ '-f', conn_file_out ] + extra_kernel_args,
-            'appResource' : 'ipython-launcher.py'
+            'appResource' : 'ipython-launcher.py',
+            'sparkProperties' : { 'sparkAppName' : 'IPython Notebook' }
         }
     else:
         sys.exit("Invalid kernel type" + kernel_type)
