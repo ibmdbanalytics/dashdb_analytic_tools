@@ -15,6 +15,7 @@ object SampleApp {
   def main(arguments: Array[String]) {
 
    val spark = SparkSession.builder().appName("SampleApp").getOrCreate()
+   val sc = spark.sparkContext
 
 {% endblock header %}
 

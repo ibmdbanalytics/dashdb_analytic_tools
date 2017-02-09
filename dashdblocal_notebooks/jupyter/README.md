@@ -1,0 +1,1 @@
+Jupyter configuration files. These go into $HOME/local/share/jupyter in the image

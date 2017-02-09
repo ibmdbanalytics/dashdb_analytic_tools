@@ -2,16 +2,25 @@
 # (c) Copyright IBM Corporation 2016
 # LICENSE: BSD-3, https://opensource.org/licenses/BSD-3-Clause
 
-NBCONVERT_OPTIONS="--to=markdown --ExecutePreprocessor.enabled=True"
-#NBCONVERT_OPTIONS="--to=markdown --ExecutePreprocessor.enabled=True --Application.log_level=DEBUG"
+set -e
+
+NBCONVERT_OPTIONS="--to=markdown --ExecutePreprocessor.enabled=True --Application.log_level=DEBUG"
 WORKDIR=/test/output/notebooks
 
 # nvbconvert always writes to the same directory where the notebooks are located
 # so copy them to the test directory
-cp *.ipynb $WORKDIR
-cd $WORKDIR
+mkdir -p $WORKDIR
+cp /test/*.ipynb $WORKDIR
 
 # run nbconvert to execute the notebooks with the Spark kernel in headless mode
-# NOTE the kernel will stay running after nbconvert has completed, need to shut down explicitly
-jupyter nbconvert $NBCONVERT_OPTIONS Spark_KMeansSample.ipynb || exit 1
+for notebook in $WORKDIR/*.ipynb; do
+    cmd="jupyter nbconvert $NBCONVERT_OPTIONS $notebook"
+    echo "Processing test notebook $notebook: $cmd"
+    $($cmd)
+    # When nbconvert kills the kernel wrapper, the actual Spark app keeps running.
+    # As a hack to avoid filling our cluster and running out of free apps, we shut down the entire
+    # Spark cluster after each converted notebook
+    curl -k -u $DASHDBUSER:$DASHDBPASS -XPOST https://$DASHDBHOST:8443/dashdb-api/analytics/public/cluster/deallocate
+done
+
 

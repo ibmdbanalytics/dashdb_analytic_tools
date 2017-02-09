@@ -1,8 +1,0 @@
-{
-  "display_name": "IDAX - Scala",
-  "language": "scala",
-  "argv": [
-    "/usr/local/bin/run-toree.py",
-    "{connection_file}"
-  ]
-}

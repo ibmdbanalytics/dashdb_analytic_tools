@@ -7,7 +7,7 @@ This project generates a Docker image that is based on the
 providing a [Jupyter notebook](http://jupyter.org/) container for
 [dashDB local](http://www.ibm.com/analytics/us/en/technology/cloud-data-services/dashdb-local/).
 It supports execution of Spark/Scala and Spark/Python kernels in the Apache Spark environment provided
-by dashDB local, using the [Apache Toree](https://toree.incubator.apache.org/) kernel.
+by dashDB local.
 
 Unlike the Spark notebooks in
 [jupyter/docker-stacks](https://github.com/jupyter/docker-stacks), there is no Apache Spark installation
@@ -17,6 +17,16 @@ and you do not need to maintain version compatibility between Spark installation
 multiple containers.
 
 Using this container requires a dashDB local installation where the integrated Spark support has been enabled.
+
+### Update: IPython kernel support
+
+While Spark/Scala support uses the [Apache Toree](https://toree.incubator.apache.org/) kernel, 
+Spark/Python support now attempts to use the more common [IPython](https://ipython.org/) kernel, thus
+enabling the use of IPython magics and particularly graphic output from Python notebook cells.
+
+Since IPython is not normally installed in a dashDB local image, the notebook container checks IPython
+availablilty on startup and, if needed, tries to install IPython into the python environment of the
+configured user via `pip install --user ipykernel`.
 
 ## Getting started
 
@@ -40,7 +50,8 @@ Follow these steps to get your own Docker container instance:
   `docker build -t dashdblocal_notebook <path to your dashdblocal_notebooks directory>`
 
 4. As root user, start a notebook container, specifying the user name and the password of a user that you have created
- inside the dashDB installation (e.g. bluadmin)
+ inside the dashDB installation (e.g. bluadmin). The provided user credentials are used to submit Spark applications
+ to dashDB, so your notebooks will execute with the credentials of this user.
 
   `docker run -it --rm --net=host -e DASHDBUSER=<user> -e DASHDBPASS=<password> dashdblocal_notebook`
 
@@ -67,7 +78,7 @@ Follow these steps to get your own Docker container instance:
 
  When you see the Jupyter start page, log in using the password for the dashDB user (the one you specified
  as DASHDBPASS) and open the Spark_KMeansSample.ipynb notebook.
- Watch the output of the notebook container while the notebook kernel launches a Toree server inside dashDB
+ Watch the output of the notebook container while the notebook kernel launches a kernel application inside dashDB
  and the browser title for the notebook still displays "(Starting) <notebook name>".
  Note that it can take more than a minute before the kernel is fully started and responsive.
 
@@ -95,7 +106,7 @@ Use `docker logs <container-name>` to see the Jupyter log output for a backgroun
 
 In the dashDB local web console you can find a tab for Spark under Monitor->Workloads. From there, you can launch
 the Apache Spark monitoring web UI. The Toree Spark kernel used by the Notebook can be monitored
-with the application name "IBM Spark Kernel".
+with the application name "IBM Spark Kernel" (for Toree) or "IPython Notebook" (for IPython).
 
 To see the output of the Spark kernel, first note its submission ID from the docker logs:
   `docker logs <notebook-container-name> | grep "Started Spark kernel"`
@@ -225,14 +236,7 @@ You can also kill "orphaned" Spark kernel applications from the Spark monitoring
 [Monitoring](#monitoring)
 
 
-## No support for IPython specific syntax
-
-Currently, Spark/Python support for notebooks is built on Toree, which handles the Jupyter kernel protocol
-and them invokes the Python interpreter directly. This implies, that Spark/Python notebooks are *not*
-built on IPython, and, by consequence, [IPython syntax extensions](http://ipython.readthedocs.io/en/stable/interactive/python-ipython-diff.html)
-are not available in Spark/Python notebooks.
-
 ## Kernel interrupt
 
-Currently, we have no way to forward an interrupt signal to the Toree kernel which runs in a different container
-without a terminal. Therefore Kernel interrupting is not supported and has no effect.
+Currently, we have no way to forward an interrupt signal to the notebook kernel which runs in a different container
+without a terminal. Therefore kernel interrupting is not supported and has no effect.
