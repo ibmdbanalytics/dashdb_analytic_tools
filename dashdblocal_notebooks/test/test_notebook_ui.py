@@ -25,7 +25,7 @@ class TestNotebookUI(unittest.TestCase):
 
     def testUI(self):
         notebook_url = 'http://localhost:8888'
-        print("Accesssing notebook at {0}".format(notebook_url))
+        print("Accessing notebook at {0}".format(notebook_url))
         resp = self.sess.get(notebook_url)
         self.assertIn("Notebook server for {0}".format(DASHDBUSER, DASHDBHOST), resp.text)
         self.assertIn('<input type="password"', resp.text)

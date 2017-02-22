@@ -28,7 +28,7 @@ def upload(upload_file):
     if (resp.status_code != requests.codes.ok):
         sys.exit("Failed to upload {0}: {1}".format(upload_file, resp))
     if (resp.json().get('resultCode') != 'SUCCESS'):
-        sys.exit("Failed to upload {0}: {1}".format(upload_file, resp.txt))
+        sys.exit("Failed to upload {0}: {1}".format(upload_file, resp.text))
     return resp.text
 
 

@@ -7,7 +7,11 @@ endif
 ifndef DASHDBUSER
 $(error DASHDBUSER is not set)
 endif
-ifndef DASHDBPASS
+
+# make will expand $-signs when reading in variables from commandline or environment
+# we need to preserve $-signs literally in passwords
+DASHDBPASS := $(shell echo $$DASHDBPASS)
+ifeq ($(DASHDBPASS),)
 $(error DASHDBPASS is not set)
 endif
 
@@ -20,7 +24,7 @@ SUBMIT_SCRIPT = output/spark-submit.sh
 
 ARCH := $(shell uname -m)
 
-CONTAINER_CFG := -e DASHDBHOST=$(DASHDBHOST) -e DASHDBUSER=$(DASHDBUSER) -e DASHDBPASS=$(DASHDBPASS)
+CONTAINER_CFG := -e DASHDBHOST=$(DASHDBHOST) -e DASHDBUSER='$(DASHDBUSER)' -e DASHDBPASS='$(DASHDBPASS)'
 ifeq ($(DASHDBHOST), localhost)
 	CONTAINER_CFG += --net=host
 else
@@ -81,7 +85,12 @@ start_interactive:
 	-docker rm -f $(CONTAINER_NAME)
 	# launch docker container
 	docker run -it --rm --entrypoint=bash -v `pwd`:/test -v `pwd`/../src:/src --name=$(CONTAINER_NAME) $(CONTAINER_CFG) $(IMAGE_NAME)
-	
+
+# check that the container is really running on port 8888
+check_port:
+	( docker logs test_dashdblocal_notebook 2>&1 | grep 'The Jupyter Notebook is running' | grep '8888/$$' ) || ( echo "Container not running on standard port 8888"; exit 1 )
+
+
 # stop and remove the test container
 # Note: simply killing the container with rm -f will not shut down running kernels in Spark
 # also shut down the Spark cluster to make sure we have no orphaned kernels left over
@@ -90,7 +99,7 @@ stop:
 	-docker stop $(CONTAINER_NAME)
 	-docker rm $(CONTAINER_NAME)
 	@echo -e '\n\n### Stopping Spark cluster for $(DASHDBUSER) ###'
-	curl -k -u $(DASHDBUSER):$(DASHDBPASS) -XPOST https://$(DASHDBHOST):8443/dashdb-api/analytics/public/cluster/deallocate
+	curl -k -u '$(DASHDBUSER):$(DASHDBPASS)' -XPOST https://$(DASHDBHOST):8443/dashdb-api/analytics/public/cluster/deallocate
 
 test: test_container_logs test_notebook_ui test_notebooks get_launcher test_bundlers
 
@@ -102,9 +111,9 @@ test_container_logs:
 	docker logs test_dashdblocal_notebook 2>&1 | grep 'Upload complete: {"result":{"filesUploaded"' >/dev/null
 
 # a few simple checks that the notebook UI is up and running
-test_notebook_ui:
+test_notebook_ui: check_port
 	@echo -e '\n\n### Checking notebook UI in test container ###'
-	DASHDBHOST=$(DASHDBHOST) DASHDBUSER=$(DASHDBUSER) DASHDBPASS=$(DASHDBPASS) python2 test_notebook_ui.py
+	DASHDBHOST=$(DASHDBHOST) DASHDBUSER='$(DASHDBUSER)' DASHDBPASS='$(DASHDBPASS)' python2 test_notebook_ui.py
 	
 # run the sample notebooks, test the kernel
 test_notebooks:
@@ -114,7 +123,7 @@ test_notebooks:
 	
 # get spark-submit script from the dashDB server
 get_launcher:
-	curl -k -v -o $(SUBMIT_SCRIPT) -u $(DASHDBUSER):$(DASHDBPASS) https://$(DASHDBHOST):8443/blushiftservices/userfiledownload.do?path=spark-submit.sh
+	curl -k -v -o $(SUBMIT_SCRIPT) -u '$(DASHDBUSER):$(DASHDBPASS)' https://$(DASHDBHOST):8443/blushiftservices/userfiledownload.do?path=spark-submit.sh
 	chmod a+rx $(SUBMIT_SCRIPT)
 	
 # test the bundlers. need the downloaded spark-submit script in the PATH
