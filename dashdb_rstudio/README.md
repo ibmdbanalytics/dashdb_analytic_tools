@@ -4,6 +4,8 @@
 
 This project generates a Docker image that is based on the [rocker/rstudio](https://github.com/rocker-org/rocker/tree/master/rstudio) image but that includes additional dashDB-specific components, such as IBM Data Server Driver packages and the ibmdbR and ibmdbRXt packages for R. The components provided by the rocker/rstudio image are described in the [documentation](https://github.com/rocker-org/rocker/wiki) for that image.     For more information about RStudio, e.g. resource requirements, please refer to the [RStudio documentation](www.rstudio.com).
 
+__NOTE:__ This Dockerfile does not support _POWER LE_ hardware.
+
 ## Getting started ##
 
 Follow these steps to get your own Docker container instance:
