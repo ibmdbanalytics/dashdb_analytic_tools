@@ -50,7 +50,7 @@ RUN cd tmp &&  \
 
 # set up jupyter environment
 # widgetsnbextension needed to avoid warning during notebook start
-RUN pip install jupyter_cms widgetsnbextension && \
+RUN pip install 'jupyter_cms<0.7.0' widgetsnbextension && \
 	jupyter cms quick-setup --sys-prefix
 
 
