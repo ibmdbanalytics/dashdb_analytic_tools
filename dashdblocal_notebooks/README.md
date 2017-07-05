@@ -20,13 +20,42 @@ Using this container requires a dashDB local installation where the integrated S
 
 ### Update: IPython kernel support
 
-While Spark/Scala support uses the [Apache Toree](https://toree.incubator.apache.org/) kernel, 
+While Spark/Scala support uses the [Apache Toree](https://toree.incubator.apache.org/) kernel,
 Spark/Python support now attempts to use the more common [IPython](https://ipython.org/) kernel, thus
 enabling the use of IPython magics and particularly graphic output from Python notebook cells.
 
 Since IPython is not normally installed in a dashDB local image, the notebook container checks IPython
 availablilty on startup and, if needed, tries to install IPython into the python environment of the
 configured user via `pip install --user ipykernel`.
+
+## PowerPC
+
+The `base-notebook` image used by the Dockerfile is not pre-built for the
+PowerPC architecture. It is therefore necessary to build it manually on machines
+using the PowerPC architecture:
+
+1. Log in to a host machine that hosts a dashDB local SMP installation or to the head node of a MPP installation.
+
+2. Install a Git client in your path, see https://git-scm.com/downloads. You can perfom this and
+ the following clone step as either the root user or a normal system user. When working as root user,
+ run an `umask 0022` before cloning the repository, to avoid stripping file permissions from the
+ local repository files.
+
+3. Issue the following command to clone the repository into a new directory:
+
+  `git clone https://github.com/jupyter/docker-stacks.git`
+
+ This creates a new directory **docker-stacks** with subdirectory base-notebook.
+
+4. Switch to the `base-notebook` directory.
+
+  `cd docker-stacks/base-notebook`
+
+4. As root user, build the `base-notebook` image:
+
+  `docker build -t base-notebook -f Dockerfile.ppc64le .`
+
+5. Continue with the steps below.
 
 ## Getting started
 
@@ -45,9 +74,13 @@ Follow these steps to get your own Docker container instance:
 
  This creates a new directory **dashdb_analytic_tools** with subdirectory dashdblocal_notebooks.
 
-3. As root user, build the image:
+3. As root user, build the image (for non-PowerPC architectures):
 
   `docker build -t dashdblocal_notebook <path to your dashdblocal_notebooks directory>`
+
+  For PowerPC-based systems, use:
+
+  `docker build -t dashdblocal_notebook -f <path to your dashdblocal_notebooks directory>/Dockerfile.ppc64le <path to your dashdblocal_notebooks directory>`
 
 4. As root user, start a notebook container, specifying the user name and the password of a user that you have created
  inside the dashDB installation (e.g. bluadmin). The provided user credentials are used to submit Spark applications
@@ -219,7 +252,7 @@ Running the notebook container on the same docker host with `--net=host` is curr
 
 The number of Spark applications that can execute in parallel on a Spark cluster is limited by the available memory.
 This limit also applies to Spark notebook kernels. On dashDB local, the maximum number of all parallel Spark applications
-(including notebooks) for _all users_ is usually 3 to 5, depending on the system configuration. 
+(including notebooks) for _all users_ is usually 3 to 5, depending on the system configuration.
 
 When that number has been reached, starting additional Spark kernels will fail and you see a message in your notebook
 that the "Kernel has failed and could not be restarted". Unfortunately, Jupyter does not currently allow kernels to report
@@ -229,10 +262,10 @@ a message like the following:
 
   `Failed to submit Spark kernel job: {"statusDesc":"Attempt to submit the application failed because the maximum number of running applications has already been reached.` ...
 
-Note: be sure to shut down Spark kernels when you are finished with a notebook, either by selecting 
-"File -> Close and Halt" in the Notebook window or by marking the notebook and selecting "Shutdown" 
-from the main notebook server view. 
-You can also kill "orphaned" Spark kernel applications from the Spark monitoring page; see the information above under 
+Note: be sure to shut down Spark kernels when you are finished with a notebook, either by selecting
+"File -> Close and Halt" in the Notebook window or by marking the notebook and selecting "Shutdown"
+from the main notebook server view.
+You can also kill "orphaned" Spark kernel applications from the Spark monitoring page; see the information above under
 [Monitoring](#monitoring)
 
 
