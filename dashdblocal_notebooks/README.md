@@ -68,21 +68,25 @@ Follow these steps to get your own Docker container instance:
  run an `umask 0022` before cloning the repository, to avoid stripping file permissions from the
  local repository files.
 
-2. Issue the following command to clone the repository into a new directory:
+3. Issue the following command to clone the repository into a new directory:
 
   `git clone https://github.com/ibmdbanalytics/dashdb_analytic_tools.git`
 
  This creates a new directory **dashdb_analytic_tools** with subdirectory dashdblocal_notebooks.
 
-3. As root user, build the image (for non-PowerPC architectures):
+4. Switch to the `dashdblocal_notebooks` directory.
 
-  `docker build -t dashdblocal_notebook <path to your dashdblocal_notebooks directory>`
+  `cd dashdb_analytic_tools/dashdblocal_notebooks`
+
+5. As root user, build the image (for non-PowerPC architectures):
+
+  `docker build -t dashdblocal_notebook .`
 
   For PowerPC-based systems, use:
 
-  `docker build -t dashdblocal_notebook -f <path to your dashdblocal_notebooks directory>/Dockerfile.ppc64le <path to your dashdblocal_notebooks directory>`
+  `docker build -t dashdblocal_notebook -f Dockerfile.ppc64le .`
 
-4. As root user, start a notebook container, specifying the user name and the password of a user that you have created
+6. As root user, start a notebook container, specifying the user name and the password of a user that you have created
  inside the dashDB installation (e.g. bluadmin). The provided user credentials are used to submit Spark applications
  to dashDB, so your notebooks will execute with the credentials of this user.
 
@@ -99,7 +103,7 @@ Follow these steps to get your own Docker container instance:
  the same network devices (fortunately, there are no port conflicts). In particular, the Jupyter server "sees" the
  kernel's communication ports on localhost
 
-6. Open the Jupyter start page `http://<hostname>:8888` in a browser, where <hostname> is the external hostname or IP of
+7. Open the Jupyter start page `http://<hostname>:8888` in a browser, where <hostname> is the external hostname or IP of
  the docker host and the dashDB system running on it. This can be done as any user from any system.
 
  If the message from `docker run` above indicates that the Jupyter server is started and listening on
@@ -115,7 +119,7 @@ Follow these steps to get your own Docker container instance:
  and the browser title for the notebook still displays "(Starting) <notebook name>".
  Note that it can take more than a minute before the kernel is fully started and responsive.
 
-7. Run the sample notebook to verify that you can access the dashDB database and perform Spark
+8. Run the sample notebook to verify that you can access the dashDB database and perform Spark
 analytics modeling.
 
 ## Shutting down
