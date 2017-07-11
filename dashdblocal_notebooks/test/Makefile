@@ -51,8 +51,8 @@ start:
 	@echo -e '\n\n### Starting test container ###'
 	# cleanup old stuff
 	-docker rm -f $(CONTAINER_NAME)
-	# fix permissions if we are root
 	rm -rf output && mkdir -p output
+	# fix permissions if we are root
 	chmod -R a+rX .
 	# launch docker container
 	docker run -d -v `pwd`:/test --name=$(CONTAINER_NAME) $(CONTAINER_CFG) $(IMAGE_NAME)
