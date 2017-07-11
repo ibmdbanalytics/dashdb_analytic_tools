@@ -33,7 +33,7 @@ run-test: image
 
 image: Dockerfile.$(ARCH)
 	@echo -e '\n\n### Building docker image for $ARCH###'
-	docker build -t $(IMAGE_NAME) -f Dockerfile.$(ARCH) ..
+	docker build --no-cache -t $(IMAGE_NAME) -f Dockerfile.$(ARCH) ..
 
 
 # Default Dockerfile is for Intel, just copy
