@@ -4,7 +4,7 @@
 
 set -e
 
-NBCONVERT_OPTIONS="--to=markdown --ExecutePreprocessor.enabled=True --Application.log_level=DEBUG"
+NBCONVERT_OPTIONS="--to=markdown --ExecutePreprocessor.enabled=True --ExecutePreprocessor.timeout=1800 --Application.log_level=DEBUG"
 WORKDIR=/test/output/notebooks
 
 # nvbconvert always writes to the same directory where the notebooks are located
@@ -22,5 +22,3 @@ for notebook in $WORKDIR/*.ipynb; do
     # Spark cluster after each converted notebook
     curl -k -u $DASHDBUSER:$DASHDBPASS -XPOST https://$DASHDBHOST:8443/dashdb-api/analytics/public/cluster/deallocate
 done
-
-
