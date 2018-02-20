@@ -114,7 +114,7 @@ test_notebooks:
 
 # get spark-submit script from the dashDB server
 get_launcher:
-	curl -k -v -o $(SUBMIT_SCRIPT) -u $(DASHDBUSER):$(DASHDBPASS) https://$(DASHDBHOST):8443/blushiftservices/userfiledownload.do?path=spark-submit.sh
+	curl -k -v -o $(SUBMIT_SCRIPT) -u $(DASHDBUSER):$(DASHDBPASS) https://$(DASHDBHOST):8443/console/blushiftservices/userfiledownload.do?path=spark-submit.sh
 	chmod a+rx $(SUBMIT_SCRIPT)
 
 # test the bundlers. need the downloaded spark-submit script in the PATH
