@@ -103,7 +103,7 @@ Follow these steps to get your own Docker container instance:
  the same network devices (fortunately, there are no port conflicts). In particular, the Jupyter server "sees" the
  kernel's communication ports on localhost
 
-7. Open the Jupyter start page `http://<hostname>:8888` in a browser, where <hostname> is the external hostname or IP of
+7. Open the Jupyter start page `http://<hostname>:8888` in a browser, where `<hostname>` is the external hostname or IP of
  the docker host and the dashDB system running on it. This can be done as any user from any system.
 
  If the message from `docker run` above indicates that the Jupyter server is started and listening on
@@ -116,7 +116,7 @@ Follow these steps to get your own Docker container instance:
  When you see the Jupyter start page, log in using the password for the dashDB user (the one you specified
  as DASHDBPASS) and open the Spark_KMeansSample.ipynb notebook.
  Watch the output of the notebook container while the notebook kernel launches a kernel application inside dashDB
- and the browser title for the notebook still displays "(Starting) <notebook name>".
+ and the browser title for the notebook still displays `(Starting) <notebook name>`.
  Note that it can take more than a minute before the kernel is fully started and responsive.
 
 8. Run the sample notebook to verify that you can access the dashDB database and perform Spark
@@ -226,7 +226,7 @@ the recommended place for keeping the files is the user's home directory:
   `docker run -v /mnt/clusterfs/home/bluuser1/work:/home/jovyan/work -e NB_UID=5003 --user=root -e DASHDBUSER=bluuser1 -e DASHDBPASS=blupass1 -it --rm --net=host dashdblocal_notebook`
 
   Notebooks are now stored in /mnt/clusterfs/home/bluuser1/work, which is inside the home folder
-  of user bluuser1 in the dasdDB container. The directory is created if it does not exist.
+  of user bluuser1 in the dashDB container. The directory is created if it does not exist.
 
 ## HTTPS support and other options from jupyter/base-notebook
 
