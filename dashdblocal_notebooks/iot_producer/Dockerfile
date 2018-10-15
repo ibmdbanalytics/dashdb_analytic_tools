@@ -13,8 +13,8 @@ RUN yum install -y \
 
 WORKDIR /producer
 
-ENV ZOOKEEPER_VERSION 3.4.8
-ENV KAFKA_VERSION 0.10.1.0
+ENV ZOOKEEPER_VERSION 3.4.13
+ENV KAFKA_VERSION 0.10.2.1
 
 # get zookeeper and unpack
 RUN curl -S http://www-eu.apache.org/dist/zookeeper/zookeeper-${ZOOKEEPER_VERSION}/zookeeper-${ZOOKEEPER_VERSION}.tar.gz | tar -xz \
