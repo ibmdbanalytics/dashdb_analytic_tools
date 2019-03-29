@@ -12,10 +12,6 @@
 FROM jupyter/base-notebook@sha256:5d2090dfb04036ec32c8c4632bb0368ffcb9a304f98e811a6386ef1c9ad010bf
 USER root
 
-# Following line is needed to install OpenJDK with the debian base of jupyter/base-notebook
-# remove for Power builds (ubuntu-based)
-RUN echo "deb http://cdn-fastly.deb.debian.org/debian jessie-proposed-updates main" >> /etc/apt/sources.list
-
 # sort packages alphabetically following docker convention
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
