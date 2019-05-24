@@ -90,7 +90,7 @@ stop:
 	-docker stop $(CONTAINER_NAME)
 	-docker rm $(CONTAINER_NAME)
 	@echo -e '\n\n### Stopping Spark cluster for $(DASHDBUSER) ###'
-	curl -k -u $(DASHDBUSER):$(DASHDBPASS) -XPOST https://$(DASHDBHOST):8443/dashdb-api/analytics/public/cluster/deallocate
+	curl --max-time 600 -k -u $(DASHDBUSER):$(DASHDBPASS) -XPOST https://$(DASHDBHOST):8443/dashdb-api/analytics/public/cluster/deallocate
 
 test: test_container_logs test_notebook_ui test_notebooks get_launcher test_bundlers
 
