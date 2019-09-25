@@ -37,7 +37,7 @@ Create the config.json file for the sparkmagic configuration file in your home d
 Create the config.json file as a copy of example_config.json
 > cp example_config.json config.json
 
-Edit the config.json file and specify username, password and url of the IAAS system in the „credentials”-sections of the 3 kernels. "8998" is the default Livy server port. As value for the “auth” attribute enter “Basic_Access”
+Edit the config.json file and specify username, password and url of the Db2 Warehouse system in the „credentials”-sections of the 3 kernels. "8998" is the default Livy server port. As value for the “auth” attribute enter “Basic_Access”
 Example: 
 ```
 {
@@ -49,7 +49,7 @@ Example:
  },
  ...
 ```
-Also remove the following section (lines 52 to 55), because the configuraion of Spark is apapted automatically to the available resources in the Db2 Warehouse container:
+Also remove the following section (lines 52 to 55), because the configuraion of Spark is adapted automatically to the available resources in the Db2 Warehouse container:
 ```
 "session_configs": {
     "driverMemory": "1000M",
@@ -67,3 +67,5 @@ You can now start the Jupyter notebook with
 
 In the notebook you can start one of the following kernels: PySpark, Spark or R. 
 You're ready!
+
+Please note that paths used in the present notebooks assume that the notebook is run by the **bluadmin** user inside of the Db2 Warehouse container. Please make sure you adapt the user name if you are not using bluadmin.
