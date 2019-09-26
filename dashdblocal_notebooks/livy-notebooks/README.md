@@ -1,3 +1,9 @@
+# Showcases for IBM Db2
+
+In the present folder, you will find Jupyter notebooks presenting various use cases for IBM Db2. 
+For each use case you will find a version in Scala (Spark kernel) and a version in Python (PySpark kernel).
+They all use livy. Lets see how to configure it!  
+
 # Configure Livy 
 
 Here we explain how to configure a livy connection so you are able to :
