@@ -1,12 +1,12 @@
 # Showcases for IBM Db2
 
-In the present folder, you will find Jupyter notebooks presenting various use cases for IBM Db2. 
+In the present folder, you will find Jupyter notebooks presenting various use cases for IBM Db2 Warehouse. 
 For each use case you will find a version in Scala (Spark kernel) and a version in Python (PySpark kernel).
-They all use livy. Lets see how to configure it!  
+They all use Livy. Lets see how to configure it!  
 
 # Configure Livy 
 
-Here we explain how to configure a livy connection so you are able to :
+Here we explain how to configure a Livy connection so you are able to :
 * work on a Jupyter notebook which you open locally 
 * let it run on a Spark cluster with IBM Db2 Warehouse.
 
@@ -73,5 +73,3 @@ You can now start the Jupyter notebook with
 
 In the notebook you can start one of the following kernels: PySpark, Spark or R. 
 You're ready!
-
-Please note that paths used in the present notebooks assume that the notebook is run by the **bluadmin** user inside of the Db2 Warehouse container. Please make sure you adapt the user name if you are not using bluadmin.
